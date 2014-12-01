@@ -1,0 +1,120 @@
+10:14:46 AM - Artisan Components, Inc.
+10:14:46 AM - Linux SOC1 2.6.9-89.ELlargesmp #1 SMP Mon Apr 20 10:43:12 EDT 2009 x86_64 x86_64 x86_64 GNU/Linux
+10:14:46 AM - Version 2005Q2V1
+10:14:46 AM - GUI version 5.6
+10:14:46 AM - 
+10:14:46 AM - CONFIDENTIAL AND PROPRIETARY SOFTWARE OF ARTISAN COMPONENTS, INC.
+10:14:46 AM - 
+10:14:46 AM - Copyright (c) 2012 Artisan Components, Inc.  All Rights Reserved.
+10:14:46 AM - 
+10:14:46 AM - Use of this Software is subject to the terms and conditions of the
+10:14:46 AM - applicable license agreement with Artisan Components, Inc. 
+10:14:46 AM - In addition, this Software is protected by patents, copyright law 
+10:14:46 AM - and international treaties.
+10:14:46 AM - 
+10:14:46 AM - The copyright notice(s) in this Software does not indicate actual or
+10:14:46 AM - intended publication of this Software.
+10:14:46 AM - 
+10:14:46 AM - High Speed/Density Diffusion ROM Generator (ROM-DIFF), SMIC Logic013 Process
+10:14:46 AM - 
+10:14:46 AM - Log file is ACI.log
+10:14:46 AM - 
+10:15:18 AM - ASCII Datatable updated
+10:15:22 AM - command: /home/lhzhu/SMIC013_Digital/SMIC013_Digital_Memory/fb_smic13_rom-diff-v20_2005q2v1/aci/rodshd/bin/rodshd postscript -instname "Bimod_Tag_ROM" -words 128 -bits 16 -frequency 5 -ring_width 5 -code_file "Bimod.rom" -mux 16 -top_layer "met5-8" -power_type rings -horiz met3 -vert met4 -cust_comment "" -bus_notation on -left_bus_delim "[" -right_bus_delim "]" -pwr_gnd_rename "VDD:VDD,GND:VSS" -prefix "" -pin_space 0.0 -name_case upper -check_instname on -diodes on -inside_ring_type GND -drive 6 -corners ff_1.32_-40.0,tt_1.2_25.0,ss_1.08_125.0,ff_1.32_0.0
+10:15:22 AM - PostScript Datasheet generator succeeded, created:
+10:15:22 AM -    Bimod_Tag_ROM.ps
+10:15:22 AM - command: /home/lhzhu/SMIC013_Digital/SMIC013_Digital_Memory/fb_smic13_rom-diff-v20_2005q2v1/aci/rodshd/bin/rodshd ascii -instname "Bimod_Tag_ROM" -words 128 -bits 16 -frequency 5 -ring_width 5 -code_file "Bimod.rom" -mux 16 -top_layer "met5-8" -power_type rings -horiz met3 -vert met4 -cust_comment "" -bus_notation on -left_bus_delim "[" -right_bus_delim "]" -pwr_gnd_rename "VDD:VDD,GND:VSS" -prefix "" -pin_space 0.0 -name_case upper -check_instname on -diodes on -inside_ring_type GND -drive 6 -corners ff_1.32_-40.0,tt_1.2_25.0,ss_1.08_125.0,ff_1.32_0.0
+10:15:23 AM - ASCII Datatable generator succeeded, created:
+10:15:23 AM -    Bimod_Tag_ROM.dat
+10:15:23 AM - command: /home/lhzhu/SMIC013_Digital/SMIC013_Digital_Memory/fb_smic13_rom-diff-v20_2005q2v1/aci/rodshd/bin/rodshd verilog -instname "Bimod_Tag_ROM" -words 128 -bits 16 -frequency 5 -ring_width 5 -code_file "Bimod.rom" -mux 16 -top_layer "met5-8" -power_type rings -horiz met3 -vert met4 -cust_comment "" -bus_notation on -left_bus_delim "[" -right_bus_delim "]" -pwr_gnd_rename "VDD:VDD,GND:VSS" -prefix "" -pin_space 0.0 -name_case upper -check_instname on -diodes on -inside_ring_type GND -drive 6 -corners ff_1.32_-40.0,tt_1.2_25.0,ss_1.08_125.0,ff_1.32_0.0
+10:15:23 AM - Verilog Model generator succeeded, created:
+10:15:23 AM -    Bimod_Tag_ROM_verilog.rcf
+10:15:23 AM -    Bimod_Tag_ROM.v
+10:15:24 AM - command: /home/lhzhu/SMIC013_Digital/SMIC013_Digital_Memory/fb_smic13_rom-diff-v20_2005q2v1/aci/rodshd/bin/rodshd vhdl -instname "Bimod_Tag_ROM" -words 128 -bits 16 -frequency 5 -ring_width 5 -code_file "Bimod.rom" -mux 16 -top_layer "met5-8" -power_type rings -horiz met3 -vert met4 -cust_comment "" -bus_notation on -left_bus_delim "[" -right_bus_delim "]" -pwr_gnd_rename "VDD:VDD,GND:VSS" -prefix "" -pin_space 0.0 -name_case upper -check_instname on -diodes on -inside_ring_type GND -drive 6 -corners ff_1.32_-40.0,tt_1.2_25.0,ss_1.08_125.0,ff_1.32_0.0
+10:15:24 AM - VHDL Model generator succeeded, created:
+10:15:24 AM -    Bimod_Tag_ROM_vhdl.rcf
+10:15:24 AM -    Bimod_Tag_ROM.vhd
+10:15:24 AM - command: /home/lhzhu/SMIC013_Digital/SMIC013_Digital_Memory/fb_smic13_rom-diff-v20_2005q2v1/aci/rodshd/bin/rodshd synopsys -instname "Bimod_Tag_ROM" -words 128 -bits 16 -frequency 5 -ring_width 5 -code_file "Bimod.rom" -mux 16 -top_layer "met5-8" -power_type rings -horiz met3 -vert met4 -cust_comment "" -bus_notation on -left_bus_delim "[" -right_bus_delim "]" -pwr_gnd_rename "VDD:VDD,GND:VSS" -prefix "" -pin_space 0.0 -name_case upper -check_instname on -diodes on -inside_ring_type GND -drive 6 -libname USERLIB -corners ff_1.32_-40.0,tt_1.2_25.0,ss_1.08_125.0,ff_1.32_0.0
+10:15:25 AM - Synopsys Model generator succeeded, created:
+10:15:25 AM -    Bimod_Tag_ROM_ff_1.32_-40.0_syn.lib
+10:15:25 AM -    Bimod_Tag_ROM_tt_1.2_25.0_syn.lib
+10:15:25 AM -    Bimod_Tag_ROM_ss_1.08_125.0_syn.lib
+10:15:25 AM -    Bimod_Tag_ROM_ff_1.32_0.0_syn.lib
+10:15:25 AM - command: /home/lhzhu/SMIC013_Digital/SMIC013_Digital_Memory/fb_smic13_rom-diff-v20_2005q2v1/aci/rodshd/bin/rodshd primetime -instname "Bimod_Tag_ROM" -words 128 -bits 16 -frequency 5 -ring_width 5 -code_file "Bimod.rom" -mux 16 -top_layer "met5-8" -power_type rings -horiz met3 -vert met4 -cust_comment "" -bus_notation on -left_bus_delim "[" -right_bus_delim "]" -pwr_gnd_rename "VDD:VDD,GND:VSS" -prefix "" -pin_space 0.0 -name_case upper -check_instname on -diodes on -inside_ring_type GND -drive 6 -corners ff_1.32_-40.0,tt_1.2_25.0,ss_1.08_125.0,ff_1.32_0.0
+10:15:26 AM - PrimeTime Model generator succeeded, created:
+10:15:26 AM -    Bimod_Tag_ROM_ff_1.32_-40.0.data
+10:15:26 AM -    Bimod_Tag_ROM_tt_1.2_25.0.data
+10:15:26 AM -    Bimod_Tag_ROM_ss_1.08_125.0.data
+10:15:26 AM -    Bimod_Tag_ROM_ff_1.32_0.0.data
+10:15:26 AM -    Bimod_Tag_ROM.mod
+10:15:27 AM - command: /home/lhzhu/SMIC013_Digital/SMIC013_Digital_Memory/fb_smic13_rom-diff-v20_2005q2v1/aci/rodshd/bin/rodshd tlf -instname "Bimod_Tag_ROM" -words 128 -bits 16 -frequency 5 -ring_width 5 -code_file "Bimod.rom" -mux 16 -top_layer "met5-8" -power_type rings -horiz met3 -vert met4 -cust_comment "" -bus_notation on -left_bus_delim "[" -right_bus_delim "]" -pwr_gnd_rename "VDD:VDD,GND:VSS" -prefix "" -pin_space 0.0 -name_case upper -check_instname on -diodes on -inside_ring_type GND -drive 6 -libname USERLIB -corners ff_1.32_-40.0,tt_1.2_25.0,ss_1.08_125.0,ff_1.32_0.0
+10:15:29 AM - TLF Model generator succeeded, created:
+10:15:29 AM -    Bimod_Tag_ROM_ff_1.32_-40.0.tlf
+10:15:29 AM -    Bimod_Tag_ROM_tt_1.2_25.0.tlf
+10:15:29 AM -    Bimod_Tag_ROM_ss_1.08_125.0.tlf
+10:15:29 AM -    Bimod_Tag_ROM_ff_1.32_0.0.tlf
+10:15:29 AM - command: /home/lhzhu/SMIC013_Digital/SMIC013_Digital_Memory/fb_smic13_rom-diff-v20_2005q2v1/aci/rodshd/bin/rodshd vclef-fp -instname "Bimod_Tag_ROM" -words 128 -bits 16 -frequency 5 -ring_width 5 -code_file "Bimod.rom" -mux 16 -top_layer "met5-8" -power_type rings -horiz met3 -vert met4 -cust_comment "" -bus_notation on -left_bus_delim "[" -right_bus_delim "]" -pwr_gnd_rename "VDD:VDD,GND:VSS" -prefix "" -pin_space 0.0 -name_case upper -check_instname on -diodes on -inside_ring_type GND -drive 6 -inst2ring blockages -site_def off -corners ff_1.32_-40.0,tt_1.2_25.0,ss_1.08_125.0,ff_1.32_0.0
+10:15:31 AM - VCLEF Footprint generator succeeded, created:
+10:15:31 AM -    Bimod_Tag_ROM.vclef
+10:15:31 AM - command: /home/lhzhu/SMIC013_Digital/SMIC013_Digital_Memory/fb_smic13_rom-diff-v20_2005q2v1/aci/rodshd/bin/rodshd gds2 -instname "Bimod_Tag_ROM" -words 128 -bits 16 -frequency 5 -ring_width 5 -code_file "Bimod.rom" -mux 16 -top_layer "met5-8" -power_type rings -horiz met3 -vert met4 -cust_comment "" -bus_notation on -left_bus_delim "[" -right_bus_delim "]" -pwr_gnd_rename "VDD:VDD,GND:VSS" -prefix "" -pin_space 0.0 -name_case upper -check_instname on -diodes on -inside_ring_type GND -drive 6 -corners ff_1.32_-40.0,tt_1.2_25.0,ss_1.08_125.0,ff_1.32_0.0
+10:15:32 AM - (tiling engine) ERROR:  rom code file is missing a linefeed character at line 127
+10:15:32 AM - (tiling engine) ERROR:         found (-1) instead
+10:15:32 AM - java.lang.RuntimeException: 
+10:15:32 AM - 	at TileEngine.zzzefb.zzzrgb(Unknown Source)
+10:15:32 AM - 	at Rodshd.zzzsbb(Unknown Source)
+10:15:32 AM - 	at Rodshd.zzzvfb(Unknown Source)
+10:15:32 AM - 	at TileEngine.zzzefb.zzziib(Unknown Source)
+10:15:32 AM - 	at Rodshd.main(Unknown Source)
+10:15:32 AM - (tiling engine) ERROR:  127
+10:15:32 AM - (tiling engine) ERROR:  problem reading file Bimod.rom
+10:15:32 AM - Exception in thread "main" java.lang.RuntimeException: 
+10:15:32 AM - 	at Rodshd.zzzsbb(Unknown Source)
+10:15:32 AM - 	at Rodshd.zzzvfb(Unknown Source)
+10:15:32 AM - 	at TileEngine.zzzefb.zzziib(Unknown Source)
+10:15:32 AM - 	at Rodshd.main(Unknown Source)
+10:15:32 AM - GDSII Layout generator failed
+10:17:40 AM - Parameters have not changed since last ASCII Datatable update
+10:17:44 AM - command: /home/lhzhu/SMIC013_Digital/SMIC013_Digital_Memory/fb_smic13_rom-diff-v20_2005q2v1/aci/rodshd/bin/rodshd postscript -instname "Bimod_Tag_ROM" -words 128 -bits 16 -frequency 5 -ring_width 5 -code_file "Bimod.rom" -mux 16 -top_layer "met5-8" -power_type rings -horiz met3 -vert met4 -cust_comment "" -bus_notation on -left_bus_delim "[" -right_bus_delim "]" -pwr_gnd_rename "VDD:VDD,GND:VSS" -prefix "" -pin_space 0.0 -name_case upper -check_instname on -diodes on -inside_ring_type GND -drive 6 -corners ff_1.32_-40.0,tt_1.2_25.0,ss_1.08_125.0,ff_1.32_0.0
+10:17:44 AM - PostScript Datasheet generator succeeded, created:
+10:17:44 AM -    Bimod_Tag_ROM.ps
+10:17:44 AM - command: /home/lhzhu/SMIC013_Digital/SMIC013_Digital_Memory/fb_smic13_rom-diff-v20_2005q2v1/aci/rodshd/bin/rodshd ascii -instname "Bimod_Tag_ROM" -words 128 -bits 16 -frequency 5 -ring_width 5 -code_file "Bimod.rom" -mux 16 -top_layer "met5-8" -power_type rings -horiz met3 -vert met4 -cust_comment "" -bus_notation on -left_bus_delim "[" -right_bus_delim "]" -pwr_gnd_rename "VDD:VDD,GND:VSS" -prefix "" -pin_space 0.0 -name_case upper -check_instname on -diodes on -inside_ring_type GND -drive 6 -corners ff_1.32_-40.0,tt_1.2_25.0,ss_1.08_125.0,ff_1.32_0.0
+10:17:44 AM - ASCII Datatable generator succeeded, created:
+10:17:44 AM -    Bimod_Tag_ROM.dat
+10:17:45 AM - command: /home/lhzhu/SMIC013_Digital/SMIC013_Digital_Memory/fb_smic13_rom-diff-v20_2005q2v1/aci/rodshd/bin/rodshd verilog -instname "Bimod_Tag_ROM" -words 128 -bits 16 -frequency 5 -ring_width 5 -code_file "Bimod.rom" -mux 16 -top_layer "met5-8" -power_type rings -horiz met3 -vert met4 -cust_comment "" -bus_notation on -left_bus_delim "[" -right_bus_delim "]" -pwr_gnd_rename "VDD:VDD,GND:VSS" -prefix "" -pin_space 0.0 -name_case upper -check_instname on -diodes on -inside_ring_type GND -drive 6 -corners ff_1.32_-40.0,tt_1.2_25.0,ss_1.08_125.0,ff_1.32_0.0
+10:17:45 AM - Verilog Model generator succeeded, created:
+10:17:45 AM -    Bimod_Tag_ROM_verilog.rcf
+10:17:45 AM -    Bimod_Tag_ROM.v
+10:17:45 AM - command: /home/lhzhu/SMIC013_Digital/SMIC013_Digital_Memory/fb_smic13_rom-diff-v20_2005q2v1/aci/rodshd/bin/rodshd vhdl -instname "Bimod_Tag_ROM" -words 128 -bits 16 -frequency 5 -ring_width 5 -code_file "Bimod.rom" -mux 16 -top_layer "met5-8" -power_type rings -horiz met3 -vert met4 -cust_comment "" -bus_notation on -left_bus_delim "[" -right_bus_delim "]" -pwr_gnd_rename "VDD:VDD,GND:VSS" -prefix "" -pin_space 0.0 -name_case upper -check_instname on -diodes on -inside_ring_type GND -drive 6 -corners ff_1.32_-40.0,tt_1.2_25.0,ss_1.08_125.0,ff_1.32_0.0
+10:17:46 AM - VHDL Model generator succeeded, created:
+10:17:46 AM -    Bimod_Tag_ROM_vhdl.rcf
+10:17:46 AM -    Bimod_Tag_ROM.vhd
+10:17:46 AM - command: /home/lhzhu/SMIC013_Digital/SMIC013_Digital_Memory/fb_smic13_rom-diff-v20_2005q2v1/aci/rodshd/bin/rodshd synopsys -instname "Bimod_Tag_ROM" -words 128 -bits 16 -frequency 5 -ring_width 5 -code_file "Bimod.rom" -mux 16 -top_layer "met5-8" -power_type rings -horiz met3 -vert met4 -cust_comment "" -bus_notation on -left_bus_delim "[" -right_bus_delim "]" -pwr_gnd_rename "VDD:VDD,GND:VSS" -prefix "" -pin_space 0.0 -name_case upper -check_instname on -diodes on -inside_ring_type GND -drive 6 -libname USERLIB -corners ff_1.32_-40.0,tt_1.2_25.0,ss_1.08_125.0,ff_1.32_0.0
+10:17:47 AM - Synopsys Model generator succeeded, created:
+10:17:47 AM -    Bimod_Tag_ROM_ff_1.32_-40.0_syn.lib
+10:17:47 AM -    Bimod_Tag_ROM_tt_1.2_25.0_syn.lib
+10:17:47 AM -    Bimod_Tag_ROM_ss_1.08_125.0_syn.lib
+10:17:47 AM -    Bimod_Tag_ROM_ff_1.32_0.0_syn.lib
+10:17:47 AM - command: /home/lhzhu/SMIC013_Digital/SMIC013_Digital_Memory/fb_smic13_rom-diff-v20_2005q2v1/aci/rodshd/bin/rodshd primetime -instname "Bimod_Tag_ROM" -words 128 -bits 16 -frequency 5 -ring_width 5 -code_file "Bimod.rom" -mux 16 -top_layer "met5-8" -power_type rings -horiz met3 -vert met4 -cust_comment "" -bus_notation on -left_bus_delim "[" -right_bus_delim "]" -pwr_gnd_rename "VDD:VDD,GND:VSS" -prefix "" -pin_space 0.0 -name_case upper -check_instname on -diodes on -inside_ring_type GND -drive 6 -corners ff_1.32_-40.0,tt_1.2_25.0,ss_1.08_125.0,ff_1.32_0.0
+10:17:49 AM - PrimeTime Model generator succeeded, created:
+10:17:49 AM -    Bimod_Tag_ROM_ff_1.32_-40.0.data
+10:17:49 AM -    Bimod_Tag_ROM_tt_1.2_25.0.data
+10:17:49 AM -    Bimod_Tag_ROM_ss_1.08_125.0.data
+10:17:49 AM -    Bimod_Tag_ROM_ff_1.32_0.0.data
+10:17:49 AM -    Bimod_Tag_ROM.mod
+10:17:49 AM - command: /home/lhzhu/SMIC013_Digital/SMIC013_Digital_Memory/fb_smic13_rom-diff-v20_2005q2v1/aci/rodshd/bin/rodshd tlf -instname "Bimod_Tag_ROM" -words 128 -bits 16 -frequency 5 -ring_width 5 -code_file "Bimod.rom" -mux 16 -top_layer "met5-8" -power_type rings -horiz met3 -vert met4 -cust_comment "" -bus_notation on -left_bus_delim "[" -right_bus_delim "]" -pwr_gnd_rename "VDD:VDD,GND:VSS" -prefix "" -pin_space 0.0 -name_case upper -check_instname on -diodes on -inside_ring_type GND -drive 6 -libname USERLIB -corners ff_1.32_-40.0,tt_1.2_25.0,ss_1.08_125.0,ff_1.32_0.0
+10:17:51 AM - TLF Model generator succeeded, created:
+10:17:51 AM -    Bimod_Tag_ROM_ff_1.32_-40.0.tlf
+10:17:51 AM -    Bimod_Tag_ROM_tt_1.2_25.0.tlf
+10:17:51 AM -    Bimod_Tag_ROM_ss_1.08_125.0.tlf
+10:17:51 AM -    Bimod_Tag_ROM_ff_1.32_0.0.tlf
+10:17:51 AM - command: /home/lhzhu/SMIC013_Digital/SMIC013_Digital_Memory/fb_smic13_rom-diff-v20_2005q2v1/aci/rodshd/bin/rodshd vclef-fp -instname "Bimod_Tag_ROM" -words 128 -bits 16 -frequency 5 -ring_width 5 -code_file "Bimod.rom" -mux 16 -top_layer "met5-8" -power_type rings -horiz met3 -vert met4 -cust_comment "" -bus_notation on -left_bus_delim "[" -right_bus_delim "]" -pwr_gnd_rename "VDD:VDD,GND:VSS" -prefix "" -pin_space 0.0 -name_case upper -check_instname on -diodes on -inside_ring_type GND -drive 6 -inst2ring blockages -site_def off -corners ff_1.32_-40.0,tt_1.2_25.0,ss_1.08_125.0,ff_1.32_0.0
+10:17:53 AM - VCLEF Footprint generator succeeded, created:
+10:17:53 AM -    Bimod_Tag_ROM.vclef
+10:17:53 AM - command: /home/lhzhu/SMIC013_Digital/SMIC013_Digital_Memory/fb_smic13_rom-diff-v20_2005q2v1/aci/rodshd/bin/rodshd gds2 -instname "Bimod_Tag_ROM" -words 128 -bits 16 -frequency 5 -ring_width 5 -code_file "Bimod.rom" -mux 16 -top_layer "met5-8" -power_type rings -horiz met3 -vert met4 -cust_comment "" -bus_notation on -left_bus_delim "[" -right_bus_delim "]" -pwr_gnd_rename "VDD:VDD,GND:VSS" -prefix "" -pin_space 0.0 -name_case upper -check_instname on -diodes on -inside_ring_type GND -drive 6 -corners ff_1.32_-40.0,tt_1.2_25.0,ss_1.08_125.0,ff_1.32_0.0
+10:17:56 AM - GDSII Layout generator failed
+10:18:19 AM - command: /home/lhzhu/SMIC013_Digital/SMIC013_Digital_Memory/fb_smic13_rom-diff-v20_2005q2v1/aci/rodshd/bin/rodshd gds2 -instname "Bimod_Tag_ROM" -words 128 -bits 16 -frequency 5 -ring_width 5 -code_file "Bimod.rom" -mux 16 -top_layer "met5-8" -power_type rings -horiz met3 -vert met4 -cust_comment "" -bus_notation on -left_bus_delim "[" -right_bus_delim "]" -pwr_gnd_rename "VDD:VDD,GND:VSS" -prefix "" -pin_space 0.0 -name_case upper -check_instname on -diodes on -inside_ring_type GND -drive 6 -corners ff_1.32_-40.0,tt_1.2_25.0,ss_1.08_125.0,ff_1.32_0.0
+10:18:22 AM - GDSII Layout generator succeeded, created:
+10:18:22 AM -    Bimod_Tag_ROM.gds2
+10:18:23 AM - command: /home/lhzhu/SMIC013_Digital/SMIC013_Digital_Memory/fb_smic13_rom-diff-v20_2005q2v1/aci/rodshd/bin/rodshd lvs -instname "Bimod_Tag_ROM" -words 128 -bits 16 -frequency 5 -ring_width 5 -code_file "Bimod.rom" -mux 16 -top_layer "met5-8" -power_type rings -horiz met3 -vert met4 -cust_comment "" -bus_notation on -left_bus_delim "[" -right_bus_delim "]" -pwr_gnd_rename "VDD:VDD,GND:VSS" -prefix "" -pin_space 0.0 -name_case upper -check_instname on -diodes on -inside_ring_type GND -drive 6 -corners ff_1.32_-40.0,tt_1.2_25.0,ss_1.08_125.0,ff_1.32_0.0
+10:18:24 AM - LVS Netlist generator succeeded, created:
+10:18:24 AM -    Bimod_Tag_ROM.cdl

@@ -1,0 +1,296 @@
+/*
+ *      CONFIDENTIAL  AND  PROPRIETARY SOFTWARE OF ARTISAN COMPONENTS, INC.
+ *      
+ *      Copyright (c) 2012  Artisan Components, Inc.  All  Rights Reserved.
+ *      
+ *      Use of this Software is subject to the terms and conditions  of the
+ *      applicable license agreement with Artisan Components, Inc. In addition,
+ *      this Software is protected by patents, copyright law and international
+ *      treaties.
+ *      
+ *      The copyright notice(s) in this Software does not indicate actual or
+ *      intended publication of this Software.
+ *      
+ *      name:			High Speed/Density Diffusion ROM Generator (ROM-DIFF)
+ *           			SMIC Logic013 Process
+ *      version:		2005Q2V1
+ *      comment:		
+ *      configuration:	 -instname "Bimod_Tag_ROM" -words 128 -bits 16 -frequency 5 -ring_width 5.0 -code_file "Bimod.rom" -mux 16 -top_layer "met5-8" -power_type rings -horiz met3 -vert met4 -cust_comment "" -bus_notation on -left_bus_delim "[" -right_bus_delim "]" -pwr_gnd_rename "VDD:VDD,GND:VSS" -prefix "" -pin_space 0.0 -name_case upper -check_instname on -diodes on -inside_ring_type GND -drive 6 -corners ff_1.32_-40.0,tt_1.2_25.0,ss_1.08_125.0,ff_1.32_0.0
+ *
+ *      Synopsys model for Synchronous Single-Port Rom
+ *
+ *      Library Name:   aci
+ *      Instance Name:  Bimod_Tag_ROM
+ *      Words:          128
+ *      Word Width:     16
+ *      Mux:            16
+ *      Process:        ff_1.32_-40.0
+ *
+ *      Creation Date:  2012-12-16 02:17:48Z
+ *      Version:        2005Q2V1
+ *
+ *      Verified With: Synopsys Primetime
+ *
+ *      Modeling Assumptions: This library contains a black box description
+ *          for a memory element.  At the library level, a
+ *          default_max_transition constraint is set to the maximum
+ *          characterized input slew.  Each output has a max_capacitance
+ *          constraint set to the highest characterized output load.
+ *          Different modes are defined in order to disable false path
+ *          during the specific mode activation when doing static timing analysis. 
+ *
+ *
+ *      Modeling Limitations: This stamp does not include power information.
+ *          Due to limitations of the stamp modeling, some data reduction was
+ *          necessary.  When reducing data, minimum values were chosen for the
+ *          fast case corner and maximum values were used for the typical and
+ *          best case corners.  It is recommended that critical timing and
+ *          setup and hold times be checked at all corners.
+ *
+ *      Known Bugs: None.
+ *
+ *      Known Work Arounds: N/A
+ *
+ */
+
+MODELDATA
+OPERATING_CONDITION "ff_1.32_-40.0";
+DESIGN              "Bimod_Tag_ROM";
+
+CELLDATA
+area                   : 36219.736;
+default_max_transition : 0.750;
+ENDCELLDATA
+
+PORTDATA
+Q[15:0] : MAXCAP(0.860);
+A[6:0] : CAP(0.030);
+CLK : CAP(0.377), MAXTRANS(0.750);
+CEN : CAP(0.007);
+ENDPORTDATA
+
+TIMINGDATA
+GLOBAL
+        lu_table_template(Bimod_Tag_ROM_bist_mux_delay_template) {
+           variable_1 : input_net_transition;
+           variable_2 : total_output_net_capacitance;
+               index_1 ("1000, 1001, 1002, 1003, 1004, 1005, 1006");
+               index_2 ("1000, 1001, 1002, 1003, 1004, 1005, 1006");
+        }
+        lu_table_template(Bimod_Tag_ROM_mux_mem_out_delay_template) {
+           variable_1 : input_net_transition;
+           variable_2 : total_output_net_capacitance;
+               index_1 ("1000, 1001, 1002, 1003, 1004, 1005, 1006");
+               index_2 ("1000, 1001, 1002, 1003, 1004, 1005, 1006");
+        }
+        lu_table_template(Bimod_Tag_ROM_mem_out_delay_template) {
+           variable_1 : input_net_transition;
+           variable_2 : total_output_net_capacitance;
+               index_1 ("1000, 1001, 1002, 1003, 1004, 1005, 1006");
+               index_2 ("1000, 1001, 1002, 1003, 1004, 1005, 1006");
+        }
+	lu_table_template(Bimod_Tag_ROM_bist_mux_slew_template) {
+           variable_1 : total_output_net_capacitance;
+               index_1 ("1000, 1001, 1002, 1003, 1004, 1005, 1006");
+        }
+	lu_table_template(Bimod_Tag_ROM_mem_out_slew_template) {
+           variable_1 : total_output_net_capacitance;
+               index_1 ("1000, 1001, 1002, 1003, 1004, 1005, 1006");
+        }
+	lu_table_template(Bimod_Tag_ROM_clk_setup_constraint_template) {
+           variable_1 : related_pin_transition;
+           variable_2 : constrained_pin_transition;
+               index_1 ("1000, 1001, 1002, 1003, 1004, 1005, 1006");
+               index_2 ("1000, 1001, 1002, 1003, 1004, 1005, 1006");
+        }
+	lu_table_template(Bimod_Tag_ROM_constraint_template) {
+           variable_1 : related_pin_transition;
+           variable_2 : constrained_pin_transition;
+               index_1 ("1000, 1001, 1002, 1003, 1004, 1005, 1006");
+               index_2 ("1000, 1001, 1002, 1003, 1004, 1005, 1006");
+        }
+ENDGLOBAL
+ARCDATA
+setup_a_A:
+                        rise_constraint(Bimod_Tag_ROM_constraint_template) {
+                        index_1 ("0.010, 0.050, 0.100, 0.200, 0.400, 0.600, 0.750");
+                        index_2 ("0.010, 0.050, 0.100, 0.200, 0.400, 0.600, 0.750");
+                        values ( \
+                          "0.156, 0.156, 0.156, 0.156, 0.157, 0.157, 0.158", \
+                          "0.155, 0.155, 0.155, 0.155, 0.155, 0.156, 0.156", \
+                          "0.153, 0.153, 0.153, 0.153, 0.153, 0.154, 0.154", \
+                          "0.149, 0.149, 0.149, 0.149, 0.150, 0.150, 0.151", \
+                          "0.142, 0.142, 0.142, 0.142, 0.142, 0.143, 0.143", \
+                          "0.134, 0.134, 0.134, 0.135, 0.135, 0.135, 0.136", \
+                          "0.129, 0.129, 0.129, 0.129, 0.129, 0.130, 0.130" \
+                        )
+                        }
+                        fall_constraint(Bimod_Tag_ROM_constraint_template) {
+                        index_1 ("0.010, 0.050, 0.100, 0.200, 0.400, 0.600, 0.750");
+                        index_2 ("0.010, 0.050, 0.100, 0.200, 0.400, 0.600, 0.750");
+                        values ( \
+                          "0.165, 0.167, 0.171, 0.178, 0.193, 0.207, 0.218", \
+                          "0.163, 0.166, 0.170, 0.177, 0.191, 0.206, 0.217", \
+                          "0.161, 0.164, 0.168, 0.175, 0.190, 0.204, 0.215", \
+                          "0.158, 0.160, 0.164, 0.171, 0.186, 0.200, 0.211", \
+                          "0.150, 0.153, 0.157, 0.164, 0.179, 0.193, 0.204", \
+                          "0.143, 0.146, 0.149, 0.157, 0.171, 0.186, 0.197", \
+                          "0.137, 0.140, 0.144, 0.151, 0.166, 0.180, 0.191" \
+                        )
+                        }
+ENDARCDATA
+ARCDATA
+hold_a_A:
+                        rise_constraint(Bimod_Tag_ROM_constraint_template) {
+                        index_1 ("0.010, 0.050, 0.100, 0.200, 0.400, 0.600, 0.750");
+                        index_2 ("0.010, 0.050, 0.100, 0.200, 0.400, 0.600, 0.750");
+                        values ( \
+                          "0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000", \
+                          "0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000", \
+                          "0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000", \
+                          "0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000", \
+                          "0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000", \
+                          "0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000", \
+                          "0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000" \
+                        )
+                        }
+                        fall_constraint(Bimod_Tag_ROM_constraint_template) {
+                        index_1 ("0.010, 0.050, 0.100, 0.200, 0.400, 0.600, 0.750");
+                        index_2 ("0.010, 0.050, 0.100, 0.200, 0.400, 0.600, 0.750");
+                        values ( \
+                          "0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000", \
+                          "0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000", \
+                          "0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000", \
+                          "0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000", \
+                          "0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000", \
+                          "0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000", \
+                          "0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000" \
+                        )
+                        }
+ENDARCDATA
+ARCDATA
+setup_cen_A:
+                        rise_constraint(Bimod_Tag_ROM_constraint_template) {
+                        index_1 ("0.010, 0.050, 0.100, 0.200, 0.400, 0.600, 0.750");
+                        index_2 ("0.010, 0.050, 0.100, 0.200, 0.400, 0.600, 0.750");
+                        values ( \
+                          "0.213, 0.213, 0.213, 0.214, 0.215, 0.216, 0.217", \
+                          "0.211, 0.212, 0.212, 0.212, 0.214, 0.215, 0.216", \
+                          "0.209, 0.210, 0.210, 0.211, 0.212, 0.213, 0.214", \
+                          "0.206, 0.206, 0.206, 0.207, 0.208, 0.209, 0.210", \
+                          "0.198, 0.199, 0.199, 0.200, 0.201, 0.202, 0.203", \
+                          "0.191, 0.191, 0.192, 0.192, 0.193, 0.195, 0.196", \
+                          "0.185, 0.186, 0.186, 0.187, 0.188, 0.189, 0.190" \
+                        )
+                        }
+                        fall_constraint(Bimod_Tag_ROM_constraint_template) {
+                        index_1 ("0.010, 0.050, 0.100, 0.200, 0.400, 0.600, 0.750");
+                        index_2 ("0.010, 0.050, 0.100, 0.200, 0.400, 0.600, 0.750");
+                        values ( \
+                          "0.117, 0.123, 0.130, 0.145, 0.175, 0.204, 0.226", \
+                          "0.116, 0.121, 0.129, 0.144, 0.173, 0.202, 0.225", \
+                          "0.114, 0.120, 0.127, 0.142, 0.171, 0.201, 0.223", \
+                          "0.110, 0.116, 0.123, 0.138, 0.167, 0.197, 0.219", \
+                          "0.103, 0.109, 0.116, 0.131, 0.160, 0.190, 0.212", \
+                          "0.095, 0.101, 0.109, 0.123, 0.153, 0.182, 0.204", \
+                          "0.090, 0.096, 0.103, 0.118, 0.147, 0.177, 0.199" \
+                        )
+                        }
+ENDARCDATA
+ARCDATA
+hold_cen_A:
+                        rise_constraint(Bimod_Tag_ROM_constraint_template) {
+                        index_1 ("0.010, 0.050, 0.100, 0.200, 0.400, 0.600, 0.750");
+                        index_2 ("0.010, 0.050, 0.100, 0.200, 0.400, 0.600, 0.750");
+                        values ( \
+                          "0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000", \
+                          "0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000", \
+                          "0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000", \
+                          "0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000", \
+                          "0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000", \
+                          "0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000", \
+                          "0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000" \
+                        )
+                        }
+                        fall_constraint(Bimod_Tag_ROM_constraint_template) {
+                        index_1 ("0.010, 0.050, 0.100, 0.200, 0.400, 0.600, 0.750");
+                        index_2 ("0.010, 0.050, 0.100, 0.200, 0.400, 0.600, 0.750");
+                        values ( \
+                          "0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000", \
+                          "0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000", \
+                          "0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000", \
+                          "0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000", \
+                          "0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000", \
+                          "0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000", \
+                          "0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000" \
+                        )
+                        }
+ENDARCDATA
+
+
+ARCDATA
+period_clk_0_A:
+                        rise_constraint(scalar) {
+                                values ("1.221")
+                        }
+                        fall_constraint(scalar) {
+                                values ("1.221")
+                        }
+ENDARCDATA
+ARCDATA
+pulsewidth_clk_h_0_A:
+                        rise_constraint(scalar) {
+                                values ("0.042")
+                        }
+                        fall_constraint(scalar) {
+                                values ("0.042")
+                        }
+ENDARCDATA
+ARCDATA
+pulsewidth_clk_l_0_A:
+                        rise_constraint(scalar) {
+                                values ("0.067")
+                        }
+                        fall_constraint(scalar) {
+                                values ("0.067")
+                        }
+ENDARCDATA
+ARCDATA
+dly_clk_q_0_A:
+                        cell_rise(Bimod_Tag_ROM_mem_out_delay_template) {
+                        index_1 ("0.010, 0.050, 0.100, 0.200, 0.400, 0.600, 0.750");
+                        index_2 ("0.000, 0.030, 0.060, 0.120, 0.280, 0.560, 0.860");
+                        values ( \
+                          "1.084, 1.099, 1.115, 1.145, 1.206, 1.309, 1.419", \
+                          "1.086, 1.101, 1.116, 1.146, 1.207, 1.310, 1.421", \
+                          "1.088, 1.103, 1.118, 1.148, 1.209, 1.312, 1.422", \
+                          "1.091, 1.106, 1.122, 1.152, 1.213, 1.316, 1.426", \
+                          "1.099, 1.114, 1.129, 1.159, 1.220, 1.323, 1.434", \
+                          "1.106, 1.121, 1.136, 1.167, 1.228, 1.331, 1.441", \
+                          "1.112, 1.127, 1.142, 1.172, 1.233, 1.336, 1.446" \
+                        )
+                        }
+                        rise_transition(Bimod_Tag_ROM_mem_out_slew_template) {
+                        index_1 ("0.000, 0.030, 0.060, 0.120, 0.280, 0.560, 0.860");
+                        values ("0.029, 0.062, 0.096, 0.163, 0.342, 0.655, 0.991")
+                        }
+                        cell_fall(Bimod_Tag_ROM_mem_out_delay_template) {
+                        index_1 ("0.010, 0.050, 0.100, 0.200, 0.400, 0.600, 0.750");
+                        index_2 ("0.000, 0.030, 0.060, 0.120, 0.280, 0.560, 0.860");
+                        values ( \
+                          "1.084, 1.099, 1.115, 1.145, 1.206, 1.309, 1.419", \
+                          "1.086, 1.101, 1.116, 1.146, 1.207, 1.310, 1.421", \
+                          "1.088, 1.103, 1.118, 1.148, 1.209, 1.312, 1.422", \
+                          "1.091, 1.106, 1.122, 1.152, 1.213, 1.316, 1.426", \
+                          "1.099, 1.114, 1.129, 1.159, 1.220, 1.323, 1.434", \
+                          "1.106, 1.121, 1.136, 1.167, 1.228, 1.331, 1.441", \
+                          "1.112, 1.127, 1.142, 1.172, 1.233, 1.336, 1.446" \
+                        )
+                        }
+                        fall_transition(Bimod_Tag_ROM_mem_out_slew_template) {
+                        index_1 ("0.000, 0.030, 0.060, 0.120, 0.280, 0.560, 0.860");
+                        values ("0.053, 0.071, 0.090, 0.128, 0.229, 0.406, 0.595")
+                        }
+ENDARCDATA
+ENDTIMINGDATA
+ENDMODELDATA

@@ -1,0 +1,35 @@
+`include "./parameters.v"
+`timescale 1ns/1ns
+
+module ECC_ctrl(
+	Test,
+	);
+	
+input Test;
+
+always@(*)
+begin
+	state_next = state_ECC;
+	case(state_ECC)
+	Idle:
+	if(i_Crypto_Authenticate_shift_dec)
+		state_next=Read_authen;
+	else
+		state_next=state_ECC;
+	
+	Read_authen:
+	if(i_Crypto_Authenticate_ok_dec && i_Crypto_Authenticate_step_cu != 2'd0)
+		state_next = Read_key_De;
+	else	if(i_Crypto_Authenticate_ok_dec && i_Crypto_Authenticate_step_cu == 2'd0)
+				state_next = Authen_success;
+			else
+				state_next = state_ECC;
+				
+	Read_key_De:
+	if(i_done_key)
+		state_next = Load_key;
+	else
+		state_next = state_ECC;
+		
+	
+			
