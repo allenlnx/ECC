@@ -12,6 +12,7 @@ add wave -divider
 add wave sim::T_top_reader:tag:core:RNG:*
 
 add wave -divider
+add wave -divider
 add wave -divider TAG:rom
 add wave sim::T_top_reader:tag:rom:*
 
