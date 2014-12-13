@@ -8,7 +8,7 @@ module	decode	(
 	i_preamble_dem	,
 	i_clear_cu	,
 	//--------------added by lhzhu -------------//
-	i_Crypto_Authenticate_step_cu ,
+	i_Authenticate_step_cu ,
 	//--------------added by lhzhu -------------//
 	o_Query_dec	,
 	o_QueryRep_dec	,
@@ -45,16 +45,13 @@ module	decode	(
 	o_access_shift_dec	,
 	o_ebv_flag_dec	,
 //--------------added by lhzhu -------------//
-	o_Crypto_Authenticate_dec ,
-	o_Crypto_Authenticate_step_dec ,
-	o_Crypto_Authenticate_shift_dec	,			//authenticate的循环移位信号
-	o_Crypto_Authenticate_ok_dec	,							//authenticate的内容输出完成
-	o_Crypto_En_dec ,
-	o_Crypto_En_shift_dec ,						//crypto指令位移信号
-	o_Crypto_En_shift_ok_dec ,
-	o_Crypto_Comm_dec ,
-	o_CSI_dec									//CSI译码值
-			);
+	o_Authenticate_dec ,
+	o_Authenticate_shift_dec	,			//authenticate的循环移位信号
+	o_Authenticate_ok_dec	,			//authenticate的内容输出完成
+	o_csi_dec		,							//CSI译码值
+	o_AuthParam_dec	,	
+	o_Address_dec
+				);
 //--------------added by lhzhu -------------//
 input			clk		;
 input			rst_n		;
@@ -63,7 +60,7 @@ input			i_data_dem	;
 input			i_newcmd_dem	;
 input			i_preamble_dem	;
 input			i_clear_cu	;
-input[1:0]		i_Crypto_Authenticate_step_cu ;
+input[1:0]		i_Authenticate_step_cu ;
 
 output			o_Query_dec	;
 reg			o_Query_dec	;
@@ -89,26 +86,15 @@ output			o_Lock_dec	;
 reg			o_Lock_dec	;
 output			o_Select_dec	;
 reg			o_Select_dec	;
-output		o_Crypto_En_shift_ok_dec ;
-reg			o_Crypto_En_shift_ok_dec ;
 
 //------------added by lhzhu--------------//
-output		o_Crypto_Authenticate_dec  ;
-reg			o_Crypto_Authenticate_dec  ; 
-output		o_Crypto_En_dec  ;	
-reg			o_Crypto_En_dec  ;	
-output		o_Crypto_Comm_dec   ;
-reg			o_Crypto_Comm_dec   ;
-output[1:0]	o_Crypto_Authenticate_step_dec   ;
-reg[1:0]   	o_Crypto_Authenticate_step_dec   ;
-output		o_CSI_dec ;
-reg[7:0]	o_CSI_dec ;
-output 		o_Crypto_Authenticate_shift_dec	;
-output 		o_Crypto_Authenticate_ok_dec		;
-reg			o_Crypto_Authenticate_shift_dec	;
-reg			o_Crypto_Authenticate_ok_dec		;
-output		o_Crypto_En_shift_dec ;
-reg 		o_Crypto_En_shift_dec ;
+output		o_Authenticate_dec  ;
+reg			o_Authenticate_dec  ; 
+output		o_csi_dec ;
+output 		o_Authenticate_shift_dec	;
+output 		o_Authenticate_ok_dec		;
+reg			o_Authenticate_shift_dec	;
+reg			o_Authenticate_ok_dec		;
 
 //------------added by lhzhu--------------//
 
@@ -159,12 +145,27 @@ reg			o_access_shift_dec	;
 output	o_ebv_flag_dec	;
 reg			o_ebv_flag_dec;
 
+//--------added by chenwu
+output[7:0]	o_AuthParam_dec	;
+reg [7:0]	o_AuthParam_dec	;
+output[15:0] o_Address_dec	;
+reg [15:0]	o_Address_dec	;
+
+reg  [1:0]		o_rfu_dec ;
+reg  			o_senRep_dec;
+reg  			o_incRepLen_dec;
+reg  [7:0]		o_csi_dec;
+reg  [11:0]		message_length;
+
+//--------added by chenwu
+
 parameter	IDLE     	=	3'b000	; 
 parameter	HUFFMAN 	=	3'b001	; 
 parameter	DATA     	=	3'b010	; 
-parameter	HANDLE   	=	3'b011	; 
-parameter	CRC     	=	3'b100	; 
-parameter	DONE     	=	3'b101	; 
+parameter	MESSAGE   	=	3'b011	; 
+parameter	HANDLE   	=	3'b100	; 
+parameter	CRC     	=	3'b101	; 
+parameter	DONE     	=	3'b111	; 
 	
 reg	[2:0] 	state, next	;
 reg	[10:0]	counter		;
@@ -172,6 +173,8 @@ reg	[7:0]	length		;
 reg	[7:0]	huffbuf		;
 reg			cmd_name_ok	;
 reg	[10:0]	max_bits_data	;
+
+
 
 always	@(posedge clk or negedge rst_n)
 	if (~rst_n)
@@ -205,12 +208,15 @@ always @ (*)
 			next	=	DONE	;
 		else if (counter==(max_bits_data-'d8)&& (o_Write_dec ||o_Read_dec ||o_TestRead_dec ||o_TestWrite_dec ) && ~o_ebv_flag_dec ) //未到ebv编码方式段，则read/write类指令max_bit_data-8
 			next	=	HANDLE	;
-		else if ((counter==(max_bits_data))&& (o_Crypto_Authenticate_dec ||o_Crypto_En_dec || o_Crypto_Comm_dec) )
-			next	=	HANDLE	;
+		else if (o_Authenticate_dec && counter==max_bits_data )
+			next 	= 	MESSAGE;
 		else if (~o_Select_dec && counter==max_bits_data)//其他情况用
 			next	=	HANDLE	;
 		else 
 			next	=	state	;
+	MESSAGE:
+		if(counter == message_length)
+			next	=	HANDLE	;
 	HANDLE:
 		if (counter=='d16 && o_ACK_dec) //ACK指令没有CRC16段
 			next	=	DONE	;
@@ -241,8 +247,6 @@ always	@(posedge clk or negedge rst_n) //对counter操作,counter表征已经decode多少
 		counter		<=	'h0	;
 	else if (o_Select_dec && (counter >= 'd24) && length> 8'h01 ) //对select指令的第25位开始（后面是mask段），不计算counter了，即counter保留24的值，来读取mask
 		counter		<=	counter	; 								//为什么length是>8'h01?
-	else if (o_Crypto_Comm_dec && (counter >= 'd1) && length> 8'h01 ) 
-		counter		<=	counter	; 
 	else if (i_valid_dem)
 		counter		<=	counter + 'h1	;   //只要有i_valid_dem出现一次（延续1个CLK），下次clk来counter+1
 	else if (state!=next)
@@ -254,10 +258,6 @@ always	@(posedge clk or negedge rst_n)//只在Select指令情况下 Select中的参数Lengt
 	else if (o_Select_dec||o_Select_dec && counter >= 'd16 && counter <= 'd23 && i_valid_dem)  //EBV是8bit长度，故3+3+2+8=16为length之前的长度，length为（17-24位	）counter=8‘d16表明已经取到了16位，在等待取第17位
 		length		<=	{length[6:0],i_data_dem}	;											//故counter=23为取第24位，counter=24已经是Mask位了。
 	else if (o_Select_dec && (counter >= 'd24) && i_valid_dem && length != 'h0) //后边的部分属于Mask部分了，因此要不断减1
-		length		<=	length - 8'h1	;
-	else if (o_Crypto_Comm_dec && counter >= 'd1 && counter <= 8'd16 && i_valid_dem) //第2-17位是o_Crypto_Comm_dec的length位
-		length		<=	{length[6:0],i_data_dem}	;
-	else if (o_Crypto_Comm_dec && counter > 'd18 && i_valid_dem)
 		length		<=	length - 8'h1	;
 	else if (state != next)
 		length		<=	8'h00;
@@ -278,9 +278,7 @@ always	@(posedge clk or negedge rst_n)
 		o_Select_dec		<=	1'b0	;
 		o_Access_dec		<=	1'b0	;
 		o_TestRead_dec		<=	1'b0	;
-		o_Crypto_Authenticate_dec <= 1'd0  ;//by lhzhu
-		o_Crypto_En_dec  	<= 1'b0;		//by lhzhu
-		o_Crypto_Comm_dec   <= 1'b0;		//by lhzhu
+		o_Authenticate_dec <= 1'd0  ;//by lhzhu
 		end
 	else if (i_newcmd_dem || i_clear_cu)
 		begin
@@ -297,9 +295,7 @@ always	@(posedge clk or negedge rst_n)
 		o_Select_dec		<=	1'b0	;
 		o_Access_dec		<=	1'b0	;
 		o_TestRead_dec		<=	1'b0	;
-		o_Crypto_Authenticate_dec <= 1'd0  ;//by lhzhu
-		o_Crypto_En_dec  	<= 1'b0;		//by lhzhu
-		o_Crypto_Comm_dec   <= 1'b0;		//by lhzhu
+		o_Authenticate_dec <= 1'd0  ;//by lhzhu
 		end
 	else if (state==HUFFMAN) begin 
 		if (counter=='h2)
@@ -327,9 +323,7 @@ always	@(posedge clk or negedge rst_n)
 			8'hc6:		o_Access_dec		<=	1'b1	;
 			8'hc8:		o_TestWrite_dec		<=	1'b1	;	
 			8'hda:		o_TestRead_dec		<=	1'b1	;
-			8'hdc:		o_Crypto_En_dec		<=	1'b1	;
-			8'hdb:		o_Crypto_Authenticate_dec <=1'b1; 
-			8'hdd:		o_Crypto_Comm_dec   <=	1'b1	;
+			8'hd5:		o_Authenticate_dec  <=  1'b1    ; 
 			default:	;
 			endcase
 			else;
@@ -339,7 +333,8 @@ always	@(posedge clk or negedge rst_n)
 always @ (*)
 	cmd_name_ok	=	o_QueryRep_dec	|| o_ACK_dec	|| o_Query_dec	|| o_QueryAdjust_dec
 				|| o_NAK_dec	|| o_ReqRN_dec	|| o_Read_dec	|| o_Write_dec	
-				|| o_TestWrite_dec || o_Lock_dec || o_Select_dec|| o_Access_dec||o_TestRead_dec||o_Crypto_Authenticate_dec||o_Crypto_En_dec ||o_Crypto_Comm_dec	;
+				|| o_TestWrite_dec || o_Lock_dec || o_Select_dec|| o_Access_dec
+				||o_TestRead_dec||o_Authenticate_dec;
 
 always @ (*)
 	o_inventory_dec	=	o_Query_dec || o_QueryAdjust_dec || o_QueryRep_dec	;
@@ -373,18 +368,8 @@ always @ (*)
 			max_bits_data	=	'd25	;
 		o_Access_dec :	
 			max_bits_data	=	'd16	;
-		o_Crypto_En_dec :
-			max_bits_data	=	'd19	;
-		o_Crypto_Comm_dec :	
-			max_bits_data	=	'd19	;
-		o_Crypto_Authenticate_dec:
-			if(i_Crypto_Authenticate_step_cu == 2'd0)
-				max_bits_data	=	'd106	;
-			else if (i_Crypto_Authenticate_step_cu ==2'd1)
-				max_bits_data	=	'd138	;
-			else if (i_Crypto_Authenticate_step_cu ==2'd2)
-				max_bits_data	=	'd266	;
-			else max_bits_data 	=	'd0;
+		o_Authenticate_dec:
+			max_bits_data  =   'd24;
 		default :
 			max_bits_data 	=	'd0	;
 		endcase
@@ -392,28 +377,27 @@ always @ (*)
 		max_bits_data 		=	'd5 	;
 	else if (state ==CRC )
 		max_bits_data 		=	'd16	;
-		
 	else
 		max_bits_data	=	'd0	;
-		/////
-
-		/////
+	
+	
 always @ (*)
 	o_session_done	=	counter=='d8&&i_valid_dem&&o_Query_dec&&state==DATA; //query的data counter数到8 （可查询，正好到session位结束）
 
 always	@(posedge clk or negedge rst_n)
 	if (~rst_n)
 		begin
-		o_q_dec	<=	4'h0	;
+		o_q_dec	<=	4'h0		;
 		o_dr_dec	<=	1'b0	;
-		o_m_dec	<=	2'h0	;
+		o_m_dec	<=	2'h0		;
 		o_trext_dec	<=	1'b0	;
 		o_sel_dec	<=	2'b0	;
 		o_session_dec<=	2'b0	;
 		o_target_dec<=	1'b0	;
-		o_session2_dec<=	2'b0	;
-		o_Crypto_Authenticate_step_dec <=2'b0 ;
-		o_CSI_dec	<=8'b0 ;
+		o_session2_dec<=2'b0	;
+		o_csi_dec	<=	8'b0 	;
+		o_Address_dec <= 16'd0	;
+		o_AuthParam_dec <= 8'hff	;
 		end
 	else if (o_Query_dec && state==DATA && i_valid_dem)
 		begin
@@ -445,12 +429,39 @@ always	@(posedge clk or negedge rst_n)
 		end
 	else if(o_QueryRep_dec && state == DATA&& (counter == 'd0 || counter == 'd1)&& i_valid_dem)
 		o_session2_dec	<=	{o_session2_dec[0],i_data_dem};     // 把query rep的data 0/1 位取出作为 o_session_dec，正好是session的位置
-	else if(o_Crypto_Authenticate_dec && state == DATA && (counter <= 'd1) && i_valid_dem )
-				o_Crypto_Authenticate_step_dec	<=	{o_Crypto_Authenticate_step_dec[0],i_data_dem}; 
-	else if (o_Crypto_Authenticate_dec && state == DATA&& (counter >= 'd2 ) && (counter <= 'd9 )&& i_valid_dem)
-				o_CSI_dec <= {o_CSI_dec[6:0],i_data_dem} ;
+	else if(o_Authenticate_dec && state == MESSAGE && (counter <= 'd7)&& i_valid_dem)
+		o_AuthParam_dec <= {o_AuthParam_dec[6:0],i_data_dem};
+	else if(o_Authenticate_dec && state == MESSAGE && (counter <= 'd23) && o_AuthParam_dec == 'h01 && i_valid_dem)
+		 o_Address_dec	<= {o_Address_dec[14:0],i_data_dem};	
 	else;
-	
+
+//--------------------------added by chengwu----------------------------	
+always@(posedge clk or negedge rst_n)
+if(~rst_n)
+begin
+		o_rfu_dec <='d0;
+		o_senRep_dec<='d0;
+		o_incRepLen_dec<='d0;
+		o_csi_dec='d0;
+		message_length<='d0;
+end
+else	if(o_Authenticate_dec && state == DATA && i_valid_dem)
+        begin
+			if(counter=='d0 || counter=='d1)
+				o_rfu_dec <= {o_rfu_dec[0],i_data_dem};
+			else if(counter=='d2)
+				o_senRep_dec <= i_data_dem;
+			else if(counter=='d3)
+				o_incRepLen_dec  <= i_data_dem;
+			else if(counter[4:0]>'d3 && counter[4:0]<'d12)
+				o_csi_dec <= {o_csi_dec[6:0],i_data_dem};
+			else if(counter[4:0]<'d24)
+				message_length <= {message_length[10:0],i_data_dem};
+		end
+else;
+			
+//-----------------------------------------------------------------------		
+				
 always @(posedge clk or negedge rst_n)
 	if(~rst_n)
 		o_ebv_flag_dec	<=	1'b0	;
@@ -525,32 +536,18 @@ always 	@(posedge clk or negedge rst_n ) //handle段移位进入
 		o_handle_dec	<=	16'h0 			;
 	else if (state ==HANDLE && i_valid_dem )
 		o_handle_dec 	<=	{o_handle_dec [14:0], i_data_dem }	;
-
-
 		
- //-------------for bimod Tag, by lhzhu
- 
- always @ (*)
-	if(o_Crypto_En_dec && state == DATA && counter <='d15)
-		begin
-		o_Crypto_En_shift_dec	 <=	i_valid_dem		;    //
-		o_Crypto_En_shift_ok_dec <= (counter == 'd16) ;
-		end
-	else begin
-		o_Crypto_En_shift_dec	 <=	1'b0			;
-		o_Crypto_En_shift_ok_dec <=  1'b0			;
-		end
  
  //-------------for authentication control, by lhzhu-------------
 always @ (*)
-	if (state ==DATA && o_Crypto_Authenticate_dec && counter >= 'd10)
+	if (state ==MESSAGE && o_Authenticate_dec && counter >= 'd8)
 		begin 
-		o_Crypto_Authenticate_shift_dec <= i_valid_dem;  // authenticate 下解调出来的有效信号
-		o_Crypto_Authenticate_ok_dec    <= counter == max_bits_data ;
+		o_Authenticate_shift_dec <= i_valid_dem;  // authenticate 下解调出来的有效信号
+		o_Authenticate_ok_dec    <= counter == message_length ;
 		end
 	else begin
-		o_Crypto_Authenticate_shift_dec 	<=	1'b0 	;
-		o_Crypto_Authenticate_ok_dec 	<=	1'b0 	;
+		o_Authenticate_shift_dec 	<=	1'b0 	;
+		o_Authenticate_ok_dec 		<=	1'b0 	;
 	end
 
 endmodule 

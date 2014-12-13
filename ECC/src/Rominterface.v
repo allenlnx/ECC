@@ -6,7 +6,6 @@ module rominterface (
 	i_wr_rom		,
 	i_addr_rom		,
 	i_wordcnt_rom	,
-//	i_data_rom	,
 	o_data_rom_16bits	,
 	o_fifo_full_rom	,	
 	o_done_rom	,
@@ -21,7 +20,6 @@ input			i_rd_rom		;
 input			i_wr_rom		;
 input	[6:0]		i_addr_rom		;
 input	[7:0]		i_wordcnt_rom	;
-//input	[15:0]		i_data_rom	;
 
 output	[15:0]		o_data_rom_16bits	;
 reg	[15:0]		o_data_rom_16bits	;

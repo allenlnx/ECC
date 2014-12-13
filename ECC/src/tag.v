@@ -42,7 +42,6 @@ tag_digital_core	core(
 	.rst_n		(rst_n 		),
 	.i_pie		(i_pie 		),
 	.o_mod		(o_mod 		),
-    .i_force_Crypto	(i_force_Crypto   ),
 	.TEST(TEST)  , 		
 	.SET (SET) ,
 	.o_A_rom(A) ,

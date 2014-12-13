@@ -325,22 +325,22 @@ always@ (posedge clk or negedge reset)
 				end	
 	else if((nextstate==ISSUE_CRYPTO_AUTHEN_1)&&(state!=ISSUE_CRYPTO_AUTHEN_1))
 				begin
-				data_out<={8'b11011011,2'd0,8'd1,64'b0,32'h10000000,handle,6'b0}	;
-				num_out <=16'd130 ;
-				num_out_byte <= 8'd17;
+				data_out<={8'b11010101,2'b10,1'b0,1'b0,8'b1,12'd24,24'h010000,handle}	;
+				num_out <=16'd72 ;
+				num_out_byte <= 8'd9;
 				end 
 	else if((nextstate==ISSUE_CRYPTO_AUTHEN_2)&&(state!=ISSUE_CRYPTO_AUTHEN_2))
 				begin
-				data_out<={8'b11011011,2'd1,8'd1,128'h2083ECB864C352D92ABA75FF4EF290F1,handle,6'b0}	;
-				num_out <=16'd162 ;
-				num_out_byte <= 8'd21;
+				data_out<={8'b11010101,2'b10,1'b0,1'b0,8'b1,12'd184,184'h02111122223333444455556666777788889999AAAABBBB,handle}	;
+				num_out <=16'd232 ;
+				num_out_byte <= 8'd29;
 				end 
-	else if((nextstate==ISSUE_CRYPTO_AUTHEN_3)&&(state!=ISSUE_CRYPTO_AUTHEN_3))
-				begin
-				data_out<={8'b11011011,2'd2,8'd1,128'hD4CCBED38DF03F156B7A8A31966D9C0F,128'h316EB30764EEA8C50AAFACAF63D82EA8,handle,6'b0}	;
-				num_out <=16'd290 ;
-				num_out_byte <= 8'd37;
-				end 
+	//else if((nextstate==ISSUE_CRYPTO_AUTHEN_3)&&(state!=ISSUE_CRYPTO_AUTHEN_3))
+	//			begin
+	//			data_out<={8'b11011011,2'd2,8'd1,128'hD4CCBED38DF03F156B7A8A31966D9C0F,128'h316EB30764EEA8C50AAFACAF63D82EA8,handle,6'b0}	;
+	//			num_out <=16'd290 ;
+	//			num_out_byte <= 8'd37;
+	//			end 
 				
 	else if((op == COMMU_OUT) && (clk_count==8'd10) && (num_out_byte>1'b0)) //for output the initial 8'b0
 				case (COMMU_OUT_STEP)
@@ -457,7 +457,7 @@ always@ (posedge clk or negedge reset )
 				if(judge_T1_complete == 1'b0)
 					begin
 						counter_T1 <= counter_T1 + 1'b1 ;
-						if (mod==1'b1 && counter_T1<`t1_min)
+						if (mod==1'b1 && counter_T1<`t1_min_relax)
 							begin 
 								T1_violate <= 1'b1;
 							end
@@ -465,7 +465,7 @@ always@ (posedge clk or negedge reset )
 							begin
 								judge_T1_complete <= 1'b1 ;
 							end
-						else if ( counter_T1>`t1_max && (q_par==0))
+						else if ( counter_T1>`t1_max_relax && (q_par==0))
 							begin
 								T1_violate <= 1'b1;
 							end

@@ -1,0 +1,42 @@
+
+//----------------------
+// Define the constants for tag test.
+//----------------------
+
+ `define NS 		32'h00000001   
+ `define NT 		32'h00000002  
+ `define NR			32'h00000003      
+ `define PID_N 		64'h0000000000000001
+ `define PID_Np1 	64'h0000000000000002
+ `define RID 		64'h0000000000000000
+ `define OPR 		32'h10000000
+ `define KTS 		128'h2b7e151628aed2a6abf7158809cf4f3c
+ `define KRT 		64'h0000000000000000
+ `define M 			128'h11111111111111111111111111111111
+ `define CSI		8'b00000001
+ `define CMD		8'b11011011
+ 
+`define i_force_Crypto	 1'b1
+`define TEST 			 1'b1
+`define SET 			 1'b1
+ 
+ 
+ /*
+ `define STEP1_R 	{8'b11011011,2'd0,8'b00000001,64'b0,32'h10000000,handle,crc}
+						CRYPTO_AUTHEN,STEP,CSI,[RID,OPR],handle,crc
+						
+ `define STEP2 		{64'b1,32'b2}
+						PID_N,NT
+						
+ `define STEP6_R	{8'b11011011,2'd1,8'b00000001,128'h2083ECB864C352D92ABA75FF4EF290F1,handle,crc}
+						CRYPTO_AUTHEN,STEP,CSI,[EKTS(NT,NS,PID_N)],handle,crc
+						
+ `define STEP7 {	128'hA14CD03B5CE1428DB5E899C0FA92C95E,64'd1}
+						EKTS(NS,NT,PID_N)
+						
+ `define STEP11_R	{8'b11011011,2'd2,8'b00000001,128'hD4CCBED38DF03F156B7A8A31966D9C0F,128'h316EB30764EEA8C50AAFACAF63D82EA8,handle,crc}
+						CRYPTO_AUTHEN,STEP,CSI,[EKTS(|PID_Np1,RID|,|OPR,NT,KRT|)],handle,crc
+						
+ `define STEP12		{128'hFFA3C7ED04710B98067DAE6815E2751F}
+						EKRT(M) (M=128'h11111111111111111111111111111111)(KRT=128'h00000000000000000000000000000000)
+*/

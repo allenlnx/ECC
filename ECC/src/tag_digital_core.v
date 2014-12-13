@@ -10,20 +10,19 @@
 
 `timescale 1ns/100ps
 module tag_digital_core	(
-	input		clk		,
-	input		rst_n		,
-	input		i_pie		,
-	input		i_force_Crypto	,
+	input			clk			,
+	input			rst_n		,
+	input			i_pie		,
 	//--------tfrom rom---------//
-	input	[15:0]	i_Q_rom ,
+	input	[15:0]	i_Q_rom 	,
 	//----------------------//
-	input   	TEST ,
-	input   	SET ,
-	output		o_mod ,
+	input   		TEST 		,
+	input   		SET 		,
+	output			o_mod 		,
 	//--------to rom---------//
-	output		o_clk_rom ,
-	output	[6:0] 	o_A_rom ,
-	output		o_CEN_rom
+	output			o_clk_rom 	,
+	output	[6:0] 	o_A_rom 	,
+	output			o_CEN_rom
 	//----------------------//
 	);
 	
@@ -31,70 +30,65 @@ module tag_digital_core	(
 	wire			data_dem		;
 	wire			valid_dem		;
 	wire			newcmd_dem		;
-	wire			preamble_dem		;
-	wire	[5:0]		tpri_dem		;
-	wire 	[8:0]		t1_dem		;
-	wire 			t1_start_dem		;
+	wire			preamble_dem	;
+	wire	[5:0]	tpri_dem		;
+	wire 	[8:0]	t1_dem			;
+	wire 			t1_start_dem	;
 	                                        	
 	// wires for decode module        
 	wire			Query_dec		;
-	wire			QueryRep_dec		;
+	wire			QueryRep_dec	;
 	wire			QueryAdjust_dec	;
-	wire			ACK_dec		;
+	wire			ACK_dec			;
 	wire			ReqRN_dec		;
 	wire			Read_dec		;
 	wire			Write_dec		;
-	wire			TestWrite_dec		;
-	wire      		TestRead_dec            ;
-	wire			inventory_dec		;
+	wire			TestWrite_dec	;
+	wire      		TestRead_dec	;
+	wire			inventory_dec	;
 	wire			Lock_dec		;
 	wire			Select_dec		;
 	wire			cmdok_dec		;
 	wire 			addr_shift_dec	;
 	wire 			data_shift_dec	;
 	wire 			wcnt_shift_dec	;
-	wire			length_shift_dec	;
+	wire			length_shift_dec;
 	wire			mask_shift_dec	;
 	wire			targetaction_shift_dec	;
-	wire			Lock_payload_dec	;
-	wire      		data_dec              ;
-	wire	[1:0]		sel_dec		;
-	wire	[1:0]		session_dec		;
-	wire			target_dec		;
-	wire			session_done		;
-	wire	[1:0]		session2_dec		;
-	wire			Access_dec		;
+	wire			Lock_payload_dec		;
+	wire      		data_dec             	;
+	wire	[1:0]	sel_dec					;
+	wire	[1:0]	session_dec				;
+	wire			target_dec				;
+	wire			session_done			;
+	wire	[1:0]	session2_dec			;
+	wire			Access_dec				;
 	wire			access_shift_dec	;
 	wire			dr_dec		;
-	wire	[15:0]		handle_dec		;
-	wire	[3:0]		q_dec			;
-	wire	[1:0]		m_dec			;
+	wire	[15:0]	handle_dec		;
+	wire	[3:0]	q_dec			;
+	wire	[1:0]	m_dec			;
 	wire			trext_dec		;
-//	wire[1:0]	 Authenticate_flag_cu		;	
-	wire	 ebv_flag_dec				;
-	wire	 Crypto_Authenticate_dec	;
-	wire	 Crypto_En_dec				;
-	wire	 Crypto_Comm_dec			;
-	wire[1:0]	 Crypto_Authenticate_step_dec	;
-	wire	 Crypto_Authenticate_shift_dec	;
-	wire	 Crypto_Authenticate_ok_dec	;
-	wire	 Crypto_En_shift_dec		;
-	wire	 Crypto_En_shift_ok_dec		;
-	wire	[7:0]	CSI_dec					;
-	wire	force_Crypto		;
-	
+
+	wire	 		ebv_flag_dec				;
+	wire		 	Authenticate_dec	;
+	wire	 		Authenticate_shift_dec	;
+	wire	 		Authenticate_ok_dec	;
+	wire 	[7:0]	AuthParam_dec;
+	wire	[15:0]	Address_dec;
+	wire	[7:0]	csi_dec		;
 	
 	
 	// wires for random generator          	
 	wire			sromd_in_rng		;
-	wire	[15:0]		random_rng		;
+	wire	[15:0]	random_rng		;
 	wire			slotz_rng		;
-	wire	seed_in_rng			;
+	wire			seed_in_rng			;
 	// wires for crc module
-	wire 	[15:0]		data_out_crc		;
-	wire      reload_crc  ;
-	wire      valid_crc   ;
-	wire      data_in_crc ;
+	wire 	[15:0]	data_out_crc		;
+	wire      		reload_crc  ;
+	wire      		valid_crc   ;
+	wire      		data_in_crc ;
 	wire 			shift_crc		;
 
 	// wires for outctrl unit
@@ -110,7 +104,6 @@ module tag_digital_core	(
 	wire 			en2blf_mod		;
 	wire 			enable_mod		;
 	wire 			mblf_mod		;
-	//wire 			dummy_mod		;
 	wire 			violate_mod		;
 
   // wires for romprom interface
@@ -118,41 +111,34 @@ module tag_digital_core	(
 	wire			wr_rom			;
 	wire	[6:0]		addr_rom			;
 	wire	[7:0]		wordcnt_rom		;
-//	wire	[15:0]		data_rom		;
 	wire	[15:0]		data_rom_16bits		;
 	wire			fifo_full_rom		;
 	wire			done_rom		;
 
-	// wires for AES ctrl
+	// wires for ECC ctrl
 	
 	wire done_key;
 	wire load_key;
 	wire load_state;
-	wire start_AES;
-	wire decry;
-	wire [127:0] key;
-	wire [127:0] state_AES;
-	wire en_AES;
-	wire equal_correct;
-	wire equal_wrong;
-	wire [63:0] PID_N_ctrl;
-//	wire [63:0] Nt_reg;
-		                                        	
-	// wires for AES core                   	
-	wire done_AES;
-	wire [127:0] result_AES; 
-  
+	wire start_ECC;
+	wire [175:0] key;
+	wire [175:0] ecc_outxa;
+	wire [175:0] ecc_outza;
+	
+	wire [162:0] basepoint;
+	// wires for ECC core                   	
+	wire done_ECC;
+    wire ecc_done_init;
 	// other GPRs
 	wire			clear_cu		;
 	wire 			newSlot_cu		;
 	wire 			decSlot_cu		;
 	wire 			key_shift_cu	;
-	assign			force_Crypto = i_force_Crypto	;
 	wire	[15:0]		handle_cu			;
 	wire 	[15:0]		random_cu			;
 	wire			payload_valid_cu		;
 	wire     		 time_up ;
-	wire [1:0]		Crypto_Authenticate_step_cu ;
+	wire [1:0]		Authenticate_step_cu ;
 	
 	// wires for gated clock
 	wire 		clk_rom		;
@@ -170,8 +156,6 @@ control CU (
 	.clk	(clk),
 	.rst_n	(rst_n),
 	.SET (SET) ,
-	.TEST (TEST) ,
-	.i_force_Crypto	(force_Crypto),
 	.i_tpri_dem	(tpri_dem),
 	.i_newcmd_dem	(newcmd_dem),
 	.i_valid_dem   (valid_dem),
@@ -211,9 +195,13 @@ control CU (
 	.i_access_shift_dec	(access_shift_dec),
 	.i_data_rom_16bits	(data_rom_16bits),
 	.i_done_rom	(done_rom),
+	//-----added by chengwu----- //
+	.i_done_ECC (done_ECC),
 	.i_fifo_full_rom	(fifo_full_rom),
+	.i_Authenticate_ok_dec	(Authenticate_ok_dec)	,
 	//-----added by lhzhu----- //
 	.i_shiftaddr_ocu	(shiftaddr_ocu),
+	.TEST (TEST) ,
 	//-----added by lhzhu----- //
 	.i_reload_ocu  (reload_ocu),
 	.i_crcen_ocu  (crcen_ocu),
@@ -222,22 +210,15 @@ control CU (
 	.i_back_rom_ocu	(back_rom_ocu),
 	.i_random_rng	(random_rng),
 	.i_slotz_rng	(slotz_rng),
-	.i_en_AES(en_AES) ,
-	//-----added by lhzhu----- //
-	.i_equal_correct	(equal_correct),
-	.i_equal_wrong	(equal_wrong),
-	.i_Crypto_Authenticate_dec (Crypto_Authenticate_dec) ,
-	.i_Crypto_En_dec (Crypto_En_dec) ,
-	.i_Crypto_Comm_dec (Crypto_Comm_dec)  ,
-	.i_Crypto_Authenticate_step_dec (Crypto_Authenticate_step_dec)  ,
-	.i_Crypto_En_shift_dec (Crypto_En_shift_dec)	,
-	.i_CSI_dec	(CSI_dec)	,
-	.i_decry_ctrl (decry) ,
+	.i_en_ECC(en_ECC) ,
+	//-----added by chengwu----- //
+	.i_Authenticate_dec (Authenticate_dec) ,
+	.i_AuthParam_dec (AuthParam_dec),
+	.i_Address_dec(Address_dec),
 	//-----added by lhzhu----- //
 	.o_addr_rom		(addr_rom),
 	.o_rd_rom		(rd_rom),
 	.o_wr_rom		(wr_rom),
-//	.o_data_rom	(data_rom),
 	.o_wordcnt_rom	(wordcnt_rom),
 	.o_handle_cu		(handle_cu),
 	.o_random_cu		(random_cu),
@@ -254,8 +235,7 @@ control CU (
 	.o_data_in_crc (data_in_crc),
 	.o_time_up   (time_up),
 	//-----added by lhzhu----- //
-//	.o_Authenticate_flag_cu(Authenticate_flag_cu)	,
-	.o_Crypto_Authenticate_step_cu (Crypto_Authenticate_step_cu),
+	.o_Authenticate_step_cu (Authenticate_step_cu),
 	.o_done_key(done_key),
 	//-----added by lhzhu----- //
 	.o_clk_rom 	(clk_rom),
@@ -292,7 +272,9 @@ decode DEC (
 	.i_newcmd_dem	(newcmd_dem	),
 	.i_preamble_dem	(preamble_dem	),
 	.i_clear_cu	(clear_cu	),
-	.i_Crypto_Authenticate_step_cu(Crypto_Authenticate_step_cu) ,
+	
+	.i_Authenticate_step_cu(Authenticate_step_cu) ,
+	
 	.o_Query_dec	(Query_dec	),
 	.o_QueryRep_dec	(QueryRep_dec	),
 	.o_QueryAdjust_dec	(QueryAdjust_dec	),
@@ -327,20 +309,18 @@ decode DEC (
 	.o_Access_dec	(Access_dec	),
 	.o_access_shift_dec	(access_shift_dec	),
 	.o_ebv_flag_dec (ebv_flag_dec),
-	.o_Crypto_Authenticate_dec (Crypto_Authenticate_dec) ,
-	.o_Crypto_Authenticate_step_dec(Crypto_Authenticate_step_dec) ,
-	.o_Crypto_Authenticate_shift_dec(Crypto_Authenticate_shift_dec) ,
-	.o_Crypto_Authenticate_ok_dec(Crypto_Authenticate_ok_dec) ,
-	.o_Crypto_En_dec(Crypto_En_dec) ,
-	.o_Crypto_En_shift_dec(Crypto_En_shift_dec) ,		
-	.o_Crypto_En_shift_ok_dec(Crypto_En_shift_ok_dec) ,
-	.o_Crypto_Comm_dec(Crypto_Comm_dec) ,
-	.o_CSI_dec(CSI_dec)		
+	
+	.o_Authenticate_dec (Authenticate_dec) ,
+	.o_Authenticate_shift_dec(Authenticate_shift_dec) ,
+	.o_Authenticate_ok_dec(Authenticate_ok_dec) ,
+	.o_csi_dec(csi_dec),
+  .o_AuthParam_dec(AuthParam_dec),
+	.o_Address_dec(Address_dec)
 );
 
 
 random_generator RNG (
-  .clk		(clk_rng		),
+	.clk		(clk_rng		),
 	.rst_n		(rst_n		) ,
 	.i_q_dec		(q_dec		),
 	.i_newSlot_cu	(newSlot_cu	),
@@ -366,11 +346,11 @@ outctrl OCU (
 	.clk		(clk_ocu		),
 	.rst_n		(rst_n		),
 	.i_ACK_dec	(ACK_dec	),
-	.i_Crypto_Authenticate_dec (Crypto_Authenticate_dec) ,
-	.i_Crypto_En_dec (Crypto_En_dec) ,
-	.i_Crypto_Comm_dec (Crypto_Comm_dec)   ,
-	.i_Crypto_Authenticate_step_cu (Crypto_Authenticate_step_cu)  ,
+	
+	.i_Authenticate_dec (Authenticate_dec) ,
+	.i_Authenticate_step_cu (Authenticate_step_cu)  ,
 	.i_data_rom_16bits	(data_rom_16bits	),
+	
 	.i_ReqRN_dec	(ReqRN_dec	),
 	.i_Read_dec	(Read_dec	),
 	.i_TestRead_dec	(TestRead_dec	),
@@ -386,9 +366,12 @@ outctrl OCU (
 	.i_clear_cu	(clear_cu	),
 	.i_handle_cu		(handle_cu		),
 	.i_random_cu		(random_cu		),
-	.i_result_AES	(result_AES	),
 	.i_data_crc	(data_out_crc	),
-	.i_PID_N_ctrl	(PID_N_ctrl),
+	//-------------added by chengwu-------------//
+	.i_key(key),
+	.i_ecc_outxa(ecc_outxa),
+	.i_ecc_outza(ecc_outza),
+	//-----------------------------------------//
 	.o_data_ocu	(data_ocu	),
 	.o_done_ocu	(done_ocu	),
 	.o_back_rom_ocu	(back_rom_ocu	),
@@ -422,54 +405,43 @@ rominterface romInterface (
 	.i_wr_rom(wr_rom),
 	.i_addr_rom(addr_rom),
 	.i_wordcnt_rom(wordcnt_rom)	,
-//	.i_data_rom(data_rom)	,
 	.o_data_rom_16bits(data_rom_16bits)	,
 	.o_fifo_full_rom(fifo_full_rom)	,	
 	.o_done_rom(done_rom)	,
 	.Q(i_Q_rom)		,
 	.CEN(o_CEN_rom)	,
-	.A(o_A_rom)
+	.A(o_A_rom) 
 	);
 
-AES_core AES(
+ecc_processor ECC(
 	.clk		(clk_aes	),
 	.rst_n		(rst_n),
-	.i_load_key	(load_key	),
-	.i_load_state (load_state ),
-	.i_start_AES	(start_AES	),
-	.decry		(decry		),
-	.i_key		(key		),
-	.i_state	(state_AES	),
-	.o_done_AES	(done_AES	),
-	.o_result_AES	(result_AES	)
+	.ecc_start  (start_ECC),
+	.g          (basepoint),
+	.k          (key[162:0]),
+	.ecc_outxa	(ecc_outxa	),
+	.ecc_outza	(ecc_outza	),
+	.ecc_done	(ecc_done_init	)
 );
 
 
-AES_ctrl AES_CTRL (
-	.TEST		(TEST		),
+ECC_ctrl ECC_CTRL (
 	.clk		(clk_act		),
 	.rst_n		(rst_n		),
-	.i_done_key (done_key),
+	.i_key_shift_cu	(key_shift_cu	),	
 	.i_time_up (time_up) ,
-	.i_key_shift_cu	(key_shift_cu	),
-	.i_data_dec (data_dec) ,
 	.i_data_rom_16bits	(data_rom_16bits	),
-	.i_random_rng	(random_rng	),
-	.i_done_AES	(done_AES	),
-	.i_result_AES	(result_AES	),
-	.i_Crypto_Authenticate_step_cu	(Crypto_Authenticate_step_cu)	,
-	.i_Crypto_Authenticate_ok_dec	(Crypto_Authenticate_ok_dec)	,
-	.i_Crypto_Authenticate_shift_dec	(Crypto_Authenticate_shift_dec)	,
-	.o_load_key	(load_key	),
-	.o_load_state (load_state),
-	.o_start_AES	(start_AES	),
+	.i_data_dec (data_dec) ,
+	.i_done_ECC	(ecc_done_init	),
+	.i_done_key (done_key),
+	.i_Authenticate_step_cu	(Authenticate_step_cu)	,
+	.i_Authenticate_ok_dec	(Authenticate_ok_dec)	,
+	.i_Authenticate_shift_dec	(Authenticate_shift_dec)	,
+	.o_start_ECC	(start_ECC	),
 	.o_key		(key		),
-	.o_state		(state_AES	),
-	.o_en_AES		(en_AES		),
-	.o_equal_correct	(equal_correct	),
-	.o_equal_wrong	(equal_wrong	),
-	.o_decry		(decry),
-	.o_PID_N_ctrl	(PID_N_ctrl)
+	.o_basepoint(basepoint),
+	.o_en_ECC		(en_ECC		),
+	.o_done_ECC(done_ECC) 
 );
 
 endmodule

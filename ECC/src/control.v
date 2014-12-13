@@ -10,7 +10,6 @@ module control (
 	clk		,
 	rst_n	,
 	SET ,
-	i_force_Crypto	,
 	i_tpri_dem	,
 	i_newcmd_dem	,
 	i_valid_dem   ,
@@ -50,11 +49,11 @@ module control (
 	i_access_shift_dec	,
 	i_data_rom_16bits	,
 	i_done_rom	,
+	i_done_ECC	,
 	//-----added by lhzhu----- //
 	i_fifo_full_rom	,
 	i_shiftaddr_ocu	,
 	TEST,
-	i_decry_ctrl,
 	//-----added by lhzhu----- //
 	i_reload_ocu  ,
 	i_crcen_ocu  ,
@@ -63,20 +62,19 @@ module control (
 	i_back_rom_ocu	,
 	i_random_rng	,
 	i_slotz_rng	,
-	i_en_AES  ,
-	//-----added by lhzhu----- //
-	i_equal_correct	,
-	i_equal_wrong	,
-	i_Crypto_Authenticate_dec  ,
-	i_Crypto_En_dec  ,
-	i_Crypto_Comm_dec   ,
-	i_Crypto_Authenticate_step_dec   ,
-	i_Crypto_En_shift_dec	,
-	i_CSI_dec		,
+	i_en_ECC  ,
+	//-----added by chengwu----//
+	i_AuthParam_dec,
+	i_Authenticate_ok_dec,
+	i_Address_dec,
+	//-----added by chengwu----//
+	i_Authenticate_dec  ,
 	//-----added by lhzhu----- //
 	o_addr_rom		,
 	o_rd_rom		,
 	o_wr_rom		,
+
+	
 //	o_data_rom	,
 	o_wordcnt_rom	,
 	o_handle_cu		,
@@ -94,8 +92,7 @@ module control (
 	o_data_in_crc ,
 	o_time_up   ,
 	//---------added by lhzhu----- //
-//	o_Authenticate_flag_cu	, //mark if tag has been authenticated
-	o_Crypto_Authenticate_step_cu , //mark the current authenticate step
+	o_Authenticate_step_cu , //mark the current authenticate step
 	o_done_key	,
 	//---------------------------- //
 	o_clk_rom 	 ,
@@ -158,12 +155,16 @@ input			i_done_ocu	;
 input			i_back_rom_ocu	;
 input	[15:0]		i_random_rng	;
 input			i_slotz_rng	;
-input			i_force_Crypto	;
-input     i_en_AES    ;
-input			i_equal_correct	;
-input			i_equal_wrong	;
+input     i_en_ECC    ;
 input			i_shiftaddr_ocu	;
-input			i_decry_ctrl;
+//-----added by chengwu----//
+input 	[7:0]	i_AuthParam_dec;
+input 	i_done_ECC;
+input	i_Authenticate_ok_dec;
+input	[15:0]	i_Address_dec;
+//-----added by chengwu----//
+
+
 output	[7:0]		o_wordcnt_rom	;
 reg	[7:0]		o_wordcnt_rom	;
 output	[6:0]		o_addr_rom		;
@@ -172,34 +173,32 @@ output			o_rd_rom		;
 reg			o_rd_rom		;
 output			o_wr_rom		;
 reg			o_wr_rom		;
-//output	[15:0]		o_data_rom	;
-//reg	[15:0]		o_data_rom	;
 output	[15:0]		o_handle_cu		;
 reg	[15:0]		o_handle_cu		;
 output	[15:0]		o_random_cu		;
 reg	[15:0]		o_random_cu		;
 output			o_seed_in_rng	;
 reg			o_seed_in_rng	;
-output			o_decSlot_cu	;
+output		o_decSlot_cu	;
 reg			o_decSlot_cu	;
-output			o_newSlot_cu	;
+output		o_newSlot_cu	;
 reg			o_newSlot_cu	;
-output			o_clear_cu	;
+output		o_clear_cu	;
 reg			o_clear_cu	;
-output			o_datarate_ocu	;
+output		o_datarate_ocu	;
 reg			o_datarate_ocu	;
-output			o_key_shift_cu	;
+output		o_key_shift_cu	;
 reg			o_key_shift_cu	;
-output			o_en2blf_mod	;
+output		o_en2blf_mod	;
 reg			o_en2blf_mod	;
-output  o_payload_valid_cu;
-output  o_reload_crc ;
-reg     o_reload_crc ;
-output	o_valid_crc ;
-reg     o_valid_crc ;
-output	o_data_in_crc ;
-reg  o_data_in_crc ;
-output o_time_up ;
+output  	o_payload_valid_cu;
+output 		o_reload_crc ;
+reg     	o_reload_crc ;
+output		o_valid_crc ;
+reg     	o_valid_crc ;
+output		o_data_in_crc ;
+reg  		o_data_in_crc ;
+output 		o_time_up ;
 
 output  o_clk_rom 	 ;
 output	o_clk_dem  ;
@@ -227,7 +226,6 @@ parameter   Reply=4'b0011;
 parameter   Acknowledged=4'b0100;
 parameter   Open=4'b0101;
 parameter	Secure=4'b0110;
-parameter   Crypto=4'b0111;
 
 parameter 	
 IDLE=5'd0,
@@ -235,9 +233,8 @@ waiting=5'd1,
 readPC=5'd2,
 readCRC=5'd3,
 readMODE=5'd4,
-readKEY_En=5'd5,
-readKEY_De=5'd6,
-//readID=5'd5,
+read_public_KEY=5'd5,
+read_private_KEY=5'd6,
 readLock=5'd7,
 readAccess=5'd8,
 InitDone=5'd9, 
@@ -255,8 +252,6 @@ newQ=5'd13,
  Lock=5'd21, 
  Compare=5'd22,
  UpdateID=5'd23,
- readCrypto_En_psw = 5'd24 ,
- readCryptoflag = 5'd25 ,
  calculate = 5'd26 ;
  
 reg [3:0] 	state,next_ts	;
@@ -274,7 +269,8 @@ reg[16:0] timer;     //for time counter, 100ms limited
 reg 		back_rom		;	
 reg  	[5:0]	c_pri		;
 reg  	[2:0]	c_m		;
-reg 	[8:0]	counter		;
+//		reg 	[8:0]	counter		; temp way to run ecc -- chengwu
+reg 	[15:0]	counter		;
 reg 		t1_start	;
 reg	[19:0]	Lock_payload	;
 reg	[9:0]	Lock_flag	;
@@ -282,8 +278,8 @@ reg	[9:0]	Lock_flag	;
 reg 	[4:0]	Inventoried_flag;
 reg	[7:0]	mask_length	;
 reg	[4:0]	mask_word_length;
-reg	[255:0]	mask		;   //mask 用于 Inventory
-reg	[255:0] mask_comparation;	 //mask_comparation 是什么？
+reg	[255:0]	mask		;   //mask used for Inventory
+reg	[255:0] mask_comparation;
 reg 		Select_done	;
 reg		Compare_done	;
 reg		Select_match	;
@@ -306,31 +302,16 @@ wire		query_posedge	;
 wire		query_ar_posedge;	
 reg		trans_flag	;
 // those update in Poweron 
-reg 		en_poweron	; //只要在poweron的状态下就有这个值为1
+reg 		en_poweron	; //power mode equals to 1
 reg 		clk_poweron	;	
 
 // ------------ added by lhzhu -------------- //
 input		TEST	;
 wire		TEST	;
-input		i_Crypto_Authenticate_dec  ; 
-input[1:0]		i_Crypto_Authenticate_step_dec	;
+input		i_Authenticate_dec  ; 
 
-input		i_Crypto_En_dec  ;	
-input		i_Crypto_En_shift_dec ;
-input		i_Crypto_Comm_dec   ;
-input		i_CSI_dec	;
-wire [7:0]	i_CSI_dec	;
-//output[1:0]		o_Authenticate_flag_cu ;
-//reg	[1:0]		o_Authenticate_flag_cu ; 
-
-reg [15:0]	Crypto_En_par ; 
-
-reg			Crypto_flag ;			//read from ROM
-reg [31:0]  Crypto_En_psw ;
-reg			Crypto_En_step_cu ;
-wire 		Crypto_Tag ;
-output[1:0]		o_Crypto_Authenticate_step_cu ;
-reg[1:0]			o_Crypto_Authenticate_step_cu ;
+output[1:0]		o_Authenticate_step_cu ;
+reg[1:0]			o_Authenticate_step_cu ;
 
 output		o_done_key	;
 wire		o_done_key	;
@@ -367,15 +348,7 @@ always @ (*)// 对next_op进行操作，op=operate，大片组合逻辑
 	next_op 		=	op 			;
 	case (op )
 	IDLE :	if(o_time_up) next_op = op ;
-	        else	next_op =	readCryptoflag ;
-	readCryptoflag:
-		if (done_rom )	begin
-			next_op =	readCrypto_En_psw ;
-		end
-		else 			next_op =	op 	;
-	readCrypto_En_psw:
-		if (done_rom ) next_op =	readCRC ;
-		else			next_op = 	op;
+	        else	next_op =	readCRC ;
 	readCRC :
 		if (done_rom )	next_op =	readPC 	;
 		else 			next_op =	op 	;
@@ -449,7 +422,6 @@ always @ (*)// 对next_op进行操作，op=operate，大片组合逻辑
 					next_ts 	=	Arbitrate 	;
 					end
 		i_ReqRN_dec :
-		if(~Crypto_Tag)
 			begin
 				if(access_flag)
 					if (handle_valid && ( state == Open || state == Secure ))
@@ -469,25 +441,8 @@ always @ (*)// 对next_op进行操作，op=operate，大片组合逻辑
 						next_ts 	=	Arbitrate 	;
 						end
 			end
-		else if (Crypto_Tag)
-			begin
-				if	(handle_valid && state ==Acknowledged)
-						next_op 	=	newHandle 	;
-					else if (handle_valid && (state == Crypto))
-						next_op  	=	newRN 		;
-					else
-						begin 
-						next_op 	=	clearCmd 	;
-						next_ts 	=	Arbitrate 	;
-						end
-			end
 		i_Write_dec :
-			if(Crypto_Tag)
-				begin 
-				next_op 	=	clearCmd 	;
-				next_ts 	=	Crypto 	;
-				end	
-			else if (handle_valid && write_valid)
+			if (handle_valid && write_valid)
 				next_op 	=	writeRom 	; 
 			else 
 				begin 
@@ -495,12 +450,7 @@ always @ (*)// 对next_op进行操作，op=operate，大片组合逻辑
 				next_ts 	=	Arbitrate 	;
 				end
 		i_Read_dec :
-			if(Crypto_Tag)
-				begin 
-				next_op 	=	clearCmd 	;
-				next_ts 	=	Crypto 	;
-				end	
-			else if (handle_valid &&read_valid )
+			if (handle_valid && read_valid )
 				next_op 	=	waitT1   	;
 			else 
 				begin 
@@ -508,12 +458,7 @@ always @ (*)// 对next_op进行操作，op=operate，大片组合逻辑
 				next_ts 	=	Arbitrate 	;
 				end	
 		i_TestWrite_dec :
-			if(Crypto_Tag)
-				begin 
-				next_op 	=	clearCmd 	;
-				next_ts 	=	Crypto 	;
-				end	
-			else if (i_handle_dec ==16'h789a )
+			if (i_handle_dec ==16'h789a )
 				next_op 	=	writeRom 	;
 			else 
 				begin 
@@ -521,12 +466,7 @@ always @ (*)// 对next_op进行操作，op=operate，大片组合逻辑
 				next_ts 	=	Arbitrate 	;
 				end
 		i_TestRead_dec :
-			if(Crypto_Tag)
-				begin 
-				next_op 	=	clearCmd 	;
-				next_ts 	=	Crypto 	;
-				end	
-			else if	(i_handle_dec ==16'h789a )
+			if	(i_handle_dec ==16'h789a )
 				next_op 	=	waitT1   	;
 			else 
 				begin 
@@ -534,12 +474,7 @@ always @ (*)// 对next_op进行操作，op=operate，大片组合逻辑
 				next_ts 	=	Arbitrate 	;
 				end		
 		i_Lock_dec:
-			if(Crypto_Tag)
-				begin 
-				next_op 	=	clearCmd 	;
-				next_ts 	=	Crypto 	;
-				end	
-			else if((state == Open)||(state == Ready)||(state == Arbitrate))  //OPEN READY ARBITRATE 不能用lock
+			if((state == Open)||(state == Ready)||(state == Arbitrate))  //OPEN READY ARBITRATE 不能用lock
 				begin
 				next_op		=	clearCmd	;
 				next_ts		=	state		;
@@ -566,12 +501,7 @@ always @ (*)// 对next_op进行操作，op=operate，大片组合逻辑
 					next_ts		=	state		;
 				end
 		i_Select_dec :
-			if(Crypto_Tag)
-				begin 
-				next_op 	=	clearCmd 	;
-				next_ts 	=	Crypto 	;
-				end	
-			else if((mask_length == 0 && Select_done) ||o_addr_rom[5:4]==2'b00 ) //mask_length？
+			if((mask_length == 0 && Select_done) ||o_addr_rom[5:4]==2'b00 ) //mask_length？
 			begin
 				next_op		=	clearCmd	;
 				next_ts		=	Ready		;
@@ -582,12 +512,7 @@ always @ (*)// 对next_op进行操作，op=operate，大片组合逻辑
 				next_ts		=	Ready		;
 			end					
 		i_Access_dec  :
-			if(Crypto_Tag)
-				begin 
-				next_op 	=	clearCmd 	;
-				next_ts 	=	Crypto 	;
-				end	
-			else if(access_flag)
+			if(access_flag)
 			  begin
 			   if(~handle_valid)
 				      next_op		=	clearCmd	;
@@ -619,56 +544,21 @@ always @ (*)// 对next_op进行操作，op=operate，大片组合逻辑
 			     else 	next_op		=	clearCmd	;
 			    end
 //-----------------added by lhzhu---------------------------//
-		i_Crypto_Authenticate_dec  : 			
-			if((o_Crypto_Authenticate_step_cu == 2'b00) && (state == Crypto) && (i_CSI_dec == 8'b00000001))
+		i_Authenticate_dec  : 			
+			if(state == Open)
 			begin
 				if(~handle_valid)
 				next_op		=	clearCmd	;
-				else if (i_Crypto_Authenticate_step_dec == o_Crypto_Authenticate_step_cu) //Intentionally use "!=" to mark the correctness of authenticate step
-				next_op 	= 	waitT1 ;
-			end	
-			else if(((o_Crypto_Authenticate_step_cu == 2'b01) || (o_Crypto_Authenticate_step_cu == 2'b10) )&& (state == Crypto) && (i_CSI_dec == 8'b00000001))
-			begin
-				if(~handle_valid)
+				else if (o_Authenticate_step_cu == 'd0 && i_AuthParam_dec =='h01) //Intentionally use "!=" to mark the correctness of authenticate step
+				next_op 	= 	read_public_KEY 	;
+				else if (o_Authenticate_step_cu == 'd1 && i_AuthParam_dec =='h02)
+				next_op 	= 	read_private_KEY 		;
+				else 
 				next_op		=	clearCmd	;
-				else if (i_Crypto_Authenticate_step_dec == o_Crypto_Authenticate_step_cu) //Intentionally use "!=" to mark the correctness of authenticate step
-				next_op 	= 	readKEY_De ;
-			end	
+			end
 			else
-				next_op 	= 	clearCmd ;
-		i_Crypto_En_dec :
-			if(Crypto_Tag)
-				begin 
-				next_op 	=	clearCmd 	;
-				next_ts 	=	Crypto 	;
-				end	
-			else if(Crypto_Tag || ~handle_valid ||!(state == Open || state == Secure) )
-				begin
-					next_op		=	clearCmd	;
-					next_ts		=	Arbitrate	;
-				end
-			else if( Crypto_En_step_cu && (Crypto_En_psw[15:0] == (Crypto_En_par^o_random_cu) ))//Crypto_En_par是decode出来的指令中的Crypto passowrd
-			    begin
-				    next_op		=	writeRom		;
-			    end
-			else if( Crypto_En_step_cu && (Crypto_En_psw[15:0] != (access_par^o_random_cu)))
-			    begin
-					next_ts		=	Arbitrate	;
-					next_op		=	clearCmd	;
-			    end	
-			else if(~Crypto_En_step_cu && (Crypto_En_psw[31:16] == (Crypto_En_par^o_random_cu)))
-			    begin
-					next_op		=	waitT1		;
-			    end
-			else if(~Crypto_En_step_cu && (Crypto_En_psw[31:16] != (Crypto_En_par^o_random_cu)))
-			    begin
-					next_ts		=	Arbitrate	;
-					next_op		=	clearCmd	;
-			    end	
-			else ;
-//		i_Crypto_Comm_dec:
-			
-			default ;
+				next_op		=	clearCmd	;
+			default;
 			endcase
 //-----------------added by lhzhu---------------------------//		
 		
@@ -720,59 +610,41 @@ always @ (*)// 对next_op进行操作，op=operate，大片组合逻辑
 				next_ts =	Acknowledged 	;
 			else if (i_ACK_dec )
 				next_ts =	state 	 	;
-			else if (i_ReqRN_dec &&state ==Acknowledged && Crypto_Tag)
-				next_ts =	Crypto 		;
 			else if (i_ReqRN_dec &&state ==Acknowledged && access_psw!= 32'h0000_0000)
 				next_ts =	Open 		;
 			else if (i_ReqRN_dec &&state ==Acknowledged && access_psw== 32'h0000_0000)
 				next_ts =	Secure 		;
 			else if (i_ReqRN_dec &&(state ==Open||state == Secure) )
 				next_ts =	state 		;
-			else if (i_ReqRN_dec &&(state == Crypto))
-				next_ts =	Crypto 	;
 			else if (i_ReqRN_dec)
 				next_ts =	Arbitrate 	;
 			else if (i_Lock_dec)
 				next_ts	=	Secure		;
-			else if (i_Crypto_Authenticate_dec)
-				next_ts =	state	;
-			else if (i_Crypto_En_dec && Crypto_En_step_cu)	
-				next_ts =	Crypto ;				
+			else if (i_Authenticate_dec)
+				next_ts =	state	;		
 			else 
 				next_ts =	state ;
 			end
 		else
 			next_op		=	op	;
-	readKEY_De :
-			if (i_equal_correct)	
-							next_op =	readKEY_En ;
-			else 			next_op =	op 	 ;
-	readKEY_En :	//KEY是读到AES控制模块 AES_CTRL 中的 利用 o_key_shift_cu
-			if (done_rom )	next_op =	authen ;
-			else 			next_op =	op 	 ;
+	read_public_KEY :
+			if (done_rom)	
+					next_op =	waitT1 ;
+			else 	next_op =	op 	 ;
+	read_private_KEY:
+			if (done_rom)	
+					next_op =	authen ;
+			else 	next_op =	op; 	
 	authen:
-			if (i_equal_correct)
+			if (i_done_ECC)
 				next_op		=	waitT1	;
-			else if (i_equal_wrong)
-				next_op		=	clearCmd	;
 			else 	
 				next_op		=	op ;
 	clearCmd :
-			next_op		=	waiting		;
+				next_op		=	waiting		;
 	default :	next_op 	=	clearCmd 	;														
 	endcase		
-	end
-//------------------------------------------------------------------------------
-// Logic for o_Authenticate_flag_cu
-//------------------------------------------------------------------------------
-/*always 	@ ( posedge clk or negedge rst_n )
-	if(~rst_n)
-		o_Authenticate_flag_cu <= 2'b0;
-	else if (i_Crypto_Authenticate_dec && state == BackScatter && i_Crypto_Authenticate_step_dec == 2'd0 )
-		o_Authenticate_flag_cu <= 2'd1 ;
-	else if (i_Crypto_Authenticate_dec && state == BackScatter && i_Crypto_Authenticate_step_dec == 2'd1 )
-		o_Authenticate_flag_cu <= o_Authenticate_flag_cu + 2'd2 ;
-	else o_Authenticate_flag_cu <= o_Authenticate_flag_cu ;*/
+end
 
 //------------------------------------------------------------------------------
 // Logic for o_Authenticate_step_cu
@@ -780,36 +652,14 @@ always @ (*)// 对next_op进行操作，op=operate，大片组合逻辑
 	
 always	@ (posedge clk or negedge rst_n)
 	if (~rst_n)
-		o_Crypto_Authenticate_step_cu <= 2'd0;
-	else if (i_Crypto_Authenticate_dec == 1'b1)
-		if ((next_op == clearCmd) && (i_Crypto_Authenticate_step_dec == o_Crypto_Authenticate_step_cu))
-		o_Crypto_Authenticate_step_cu <= o_Crypto_Authenticate_step_cu + 1'b1;
-		else  ;
+		o_Authenticate_step_cu <= 2'b00;
+	else if ((next_op == clearCmd) && (i_AuthParam_dec == 'h01))
+		o_Authenticate_step_cu <= 2'b01;
+	else if ((next_op == clearCmd) && (i_AuthParam_dec == 'h02))
+		o_Authenticate_step_cu <= 2'b00;
 	else;
 		
-//------------------------------------------------------------------------------
-// Logic for Crypto_Step_cu
-//------------------------------------------------------------------------------
-always	@ (posedge clk or negedge rst_n)
-	if (~rst_n)
-		begin 
-		Crypto_En_step_cu 		<=	1'b0 	;
-		end 	
-	else if (i_Crypto_En_dec && op == clearCmd)
-	begin
-		if  ( ~Crypto_En_step_cu && Crypto_En_psw[31:16] == (Crypto_En_par^o_random_cu) && (state == Open || state == Crypto))   
-			Crypto_En_step_cu 		<=	1'b1 	;
-					
-		else if ( ~Crypto_En_step_cu && access_psw[31:16] != (Crypto_En_par^o_random_cu) && (state == Open || state == Crypto)) 
-			Crypto_En_step_cu		<=	1'b0	;
-			
-		else if ( Crypto_En_step_cu && (state == Open || state == Crypto) && access_psw[15:0] != (access_par^o_random_cu))
-			Crypto_En_step_cu		<=	1'b0	;
-			
-		else;
-	end
-	else;
-//--------------------------------------//		
+
 //------------------------------------------------------------------------------
 // Address for read&write
 //------------------------------------------------------------------------------
@@ -824,7 +674,7 @@ always 	@ ( posedge clk or negedge rst_n )
 	
 always @ (*)
 	begin
-	o_rd_rom	=	op ==readrom || back_rom ||op ==readCRC ||op ==readPC ||op ==readKEY_En ||op ==readKEY_De||op == readLock||op == readAccess || op==readCryptoflag || op==readCrypto_En_psw;
+	o_rd_rom	=	op ==readrom || back_rom ||op ==readCRC ||op ==readPC ||op ==read_public_KEY ||op ==read_private_KEY||op == readLock||op == readAccess ;
 	o_wr_rom	=	op ==writeRom || op == Lock;
 	end
 	
@@ -850,7 +700,7 @@ always	@(posedge clk or negedge rst_n )
 		
 	assign shiftaddr 	=	(i_ACK_dec||i_Read_dec)? (~shiftaddr_d && i_shiftaddr_ocu): i_fifo_full_rom ; //读写存储器的word总数的递减控制信号
 	assign done_rom 	=	~done_rom_d &i_done_rom	; 
-	assign o_done_key	=	done_rom && (op == readKEY_En || op == readKEY_De);
+	assign o_done_key	=	done_rom && (op == read_public_KEY ||op == read_private_KEY);
 	
 always	@(posedge clk or negedge rst_n)
 	if (~rst_n)
@@ -878,27 +728,12 @@ always	@(posedge clk or negedge rst_n)
 		o_addr_rom	<=	7'b0010001	;	// pc
 		o_wordcnt_rom	<=	8'h1	;
 		end	
-	else if (i_back_rom_ocu && i_ACK_dec && !Crypto_Tag )
+	else if (i_back_rom_ocu && i_ACK_dec )
 		begin 
 		o_addr_rom 	<=	7'b0010001 	;  //PC,EPC
 		o_wordcnt_rom 	<=	{3'b000,pc} + 8'b1 ; //pc的倒数四个数字
 		end
-	else if (i_back_rom_ocu && i_ACK_dec && Crypto_Tag )
-		begin 
-		o_addr_rom 	<=	7'b0100000 	;  //PC,TID
-		o_wordcnt_rom 	<=	{3'b000,pc} + 8'b1 ; //pc的倒数四个数字
-		end
 //-------------------------------------------------00 indicates Reserved bank
-	else if (newstate && next_op ==readCryptoflag)
-		begin
-		o_addr_rom	<=	7'b0000010	;	// Cryptoflag
-		o_wordcnt_rom	<=	8'h1	;
-		end
-	else if (newstate && next_op ==readCrypto_En_psw)
-		begin
-		o_addr_rom	<=	7'b0000100	;	// Crypto_En_psw
-		o_wordcnt_rom	<=	8'h2	;
-		end
 	else if (newstate && next_op == readAccess) //指令，状态寄存器即将变化即将变化那么newstate就有效
 		begin
 		o_addr_rom	<=	7'b0000000	;	//Access password 
@@ -909,15 +744,15 @@ always	@(posedge clk or negedge rst_n)
 		o_addr_rom	<=	7'b0000011	;	//Lock flag 
 		o_wordcnt_rom	<=	8'h1	;
 		end
-	else if (newstate && next_op ==readKEY_En )
+	else if (newstate && next_op ==read_public_KEY )
 		begin
-		o_addr_rom	<=	7'b0110000	;	// AES EnKEY,128bits
-		o_wordcnt_rom	<=	8'd8	;
+		o_addr_rom	<=	i_Address_dec[6:0]	;	// AES EnKEY,128bits
+		o_wordcnt_rom	<=	8'd11	;
 		end	
-	else if (newstate && next_op ==readKEY_De )
+	else if (newstate && next_op ==read_private_KEY )
 		begin
-		o_addr_rom	<=	7'b0111000	;	// AES DeKEY,128bits
-		o_wordcnt_rom	<=	8'd8	;
+		o_addr_rom	<=	'd0	;	// ECC private,163bits
+		o_wordcnt_rom	<=	8'd11	;
 		end	
 	else if (newstate &&next_op ==writeRom )
 		begin 
@@ -933,14 +768,10 @@ always	@(posedge clk or negedge rst_n)
 	else if (op ==waiting &&i_addr_shift_dec )
 		o_addr_rom 	<=	{o_addr_rom [5:0],i_data_dec }	;
 		
-	else if (op ==waiting &&i_wcnt_shift_dec )
-		o_wordcnt_rom 	<=	{o_wordcnt_rom [6:0],i_data_dec }	;
 	else begin
 		o_addr_rom	<=	o_addr_rom	;
 		o_wordcnt_rom	<= o_wordcnt_rom 	;
-	end
-
-			
+	end	
 			
  //gated clock for poweron read 
 always @ (negedge clk or negedge rst_n)   
@@ -952,15 +783,6 @@ if(!rst_n)
 always @ (*)
 	clk_poweron =	en_poweron &clk	;
 
-always	@(posedge clk or negedge rst_n)
-	if (~rst_n)
-		Crypto_flag		<=	1'b0	;
-	else if (shiftaddr && op ==readCryptoflag )
-		Crypto_flag		<=	i_data_rom_16bits[0]	;
-	else if (op == writeRom)
-		Crypto_flag		<=	1'b1	;
-	else ;
-		
 //-----------------------------------------------//
 always 	@(posedge clk_poweron or negedge rst_n )
 	if (~rst_n )
@@ -974,45 +796,6 @@ always 	@(posedge clk_poweron or negedge rst_n )
 	else if (op ==readAccess && shiftaddr)  //fifo只有16位，i_data_rom_16bits存储器读出数据，16 bit形式
 		access_psw 	<=	{access_psw[15:0],i_data_rom_16bits}	;
 		
-//---------------added by lhzhu------------------//
-always 	@(posedge clk_poweron or negedge rst_n )
-	if (~rst_n )
-		Crypto_En_psw 	<=	32'h0 		;//Crypto_En password
-	else if (op ==readCrypto_En_psw && shiftaddr)  //fifo只有16位，i_data_rom_16bits存储器读出数据，16 bit形式
-		Crypto_En_psw 	<=	{Crypto_En_psw[15:0],i_data_rom_16bits}	;
-//---------------added by lhzhu------------------//	
-/*
-//gated clock for write
-reg		en_data_rom	;
-reg		clk_data_rom	;
-always @ (*)
-	if (~clk)	en_data_rom =	i_data_shift_dec || (op !=writeRom &&next_op ==writeRom ) || (op != Lock&&next_op==Lock);
-
-always @ (*)
-	clk_data_rom =	en_data_rom &clk	;
-
-always 	@(posedge clk_data_rom or negedge rst_n )
-	if (~rst_n )
-		o_data_rom	<=	16'h0 	;
-	else if(op != Lock && next_op == Lock && i_Lock_dec ) //为即将到来的next_op=lock做准备数据，共9-0 10位
-		begin
-		o_data_rom[15:10]	<=	6'b0;
-		o_data_rom[8]	<=	(Lock_flag[8]||~Lock_payload[18])?Lock_flag[8]:Lock_payload[8];//lock_payload？ 
-		o_data_rom[6]	<=	(Lock_flag[6]||~Lock_payload[16])?Lock_flag[6]:Lock_payload[6];
-		o_data_rom[4]	<=	(Lock_flag[4]||~Lock_payload[14])?Lock_flag[4]:Lock_payload[4];
-		o_data_rom[2]	<=	(Lock_flag[2]||~Lock_payload[12])?Lock_flag[2]:Lock_payload[2];
-		o_data_rom[0]	<=	(Lock_flag[0]||~Lock_payload[10])?Lock_flag[0]:Lock_payload[0];
-		o_data_rom[9]	<=	(Lock_flag[8]&&~Lock_flag[9])?Lock_flag[9]:(Lock_payload[19]?Lock_payload[9]:Lock_flag[9])	;
-		o_data_rom[7]	<=	(Lock_flag[6]&&~Lock_flag[7])?Lock_flag[7]:(Lock_payload[17]?Lock_payload[7]:Lock_flag[7])	;
-		o_data_rom[5]	<=	(Lock_flag[4]&&~Lock_flag[5])?Lock_flag[5]:(Lock_payload[15]?Lock_payload[5]:Lock_flag[5])	;
-		o_data_rom[3]	<=	(Lock_flag[2]&&~Lock_flag[3])?Lock_flag[3]:(Lock_payload[13]?Lock_payload[3]:Lock_flag[3])	;
-		o_data_rom[1]	<=	(Lock_flag[0]&&~Lock_flag[1])?Lock_flag[1]:(Lock_payload[11]?Lock_payload[1]:Lock_flag[1])	;
-		end
-	else if (i_data_shift_dec )//取数据参数使能，高有效，当有效时，指令中（write，testwrite）的数据参数串行进入数据寄存器
-		o_data_rom 	<=	{o_data_rom [14:0],i_data_dec }	;//每次左移一位
-	else if (op !=writeRom && next_op ==writeRom &&(i_Write_dec) )
-			o_data_rom 	<=	o_data_rom^o_random_cu	;//o_random_rng	16	RNG输出的随机数
-	else ;*/
 
 //------------------------------------------------------------------------------
 // New function: UpdateID and timer. by xshen
@@ -1113,12 +896,6 @@ always	@(posedge clk or negedge rst_n)
 	else if(i_Access_dec && i_access_shift_dec)
 		access_par	<=	{access_par[15:0],i_data_dec}	;
 
-always	@(posedge clk or negedge rst_n)
-	if(~rst_n)
-		Crypto_En_par	<=	16'h0000	;
-	else if(i_Crypto_En_dec && i_Crypto_En_shift_dec)
-		Crypto_En_par	<=	{Crypto_En_par[15:0],i_data_dec}	;
-		
 assign o_payload_valid_cu =1'b1;
 /* ((Lock_flag[8]&i_data_rom[8])||~Lock_flag[8]) && 
 ((Lock_flag[7]&i_data_rom[16])||~Lock_flag[7]) && 
@@ -1145,7 +922,7 @@ assign	access_posedge = i_Access_dec && ~access_delay	;
 
 //i_access_dec到来的那个瞬间，到下一个clk来之前，access_posedge有效。
 //这个access_posedge使得该clk的到来后access_flag=1'b1。即挑出刚译码完成的时间
-//即：access_flag和i_Crypto_flag都是表征之前曾接收过到一个相应的指令（1‘b1）。此时再次接收就翻转回0
+//即：access_flag和i_flag都是表征之前曾接收过到一个相应的指令（1‘b1）。此时再次接收就翻转回0
 
 
 //-------------------------------------------//
@@ -1503,8 +1280,19 @@ always 	@(posedge clk or negedge rst_n )
 		end 
 	else if (i_t1_start_dem )
 		begin 
-		counter 		<=	i_t1_dem	;
-		t1_start 		<=	1'b1 	;
+		// tempraral way to run ecc 
+		//counter 		<=	i_t1_dem	; 
+		//t1_start 		<=	1'b1 	;
+		if (i_AuthParam_dec != 'h02)
+			begin
+				counter 		<=	i_t1_dem	;
+				t1_start 		<=	1'b1 	;
+			end
+		else
+			begin
+				counter			<= 16'ha000 - 1;
+				t1_start 		<=	1'b1 	;
+			end
 		end
 	else if (i_newcmd_dem )
 		t1_start 		<=	1'b0 	;
@@ -1538,7 +1326,6 @@ always	@(posedge clk_rn16 or negedge rst_n)
 	else if (op==newRN )
 		o_random_cu 	<=	i_random_rng 	;
 		
-assign	Crypto_Tag	= i_force_Crypto || Crypto_flag ;
 assign 	handle_valid 	=	i_handle_dec == o_handle_cu	;
 
 always @ (*)
@@ -1552,7 +1339,7 @@ always @ (*)
 	o_clear_cu		=	op ==clearCmd			 	; //将 状态/指令全部清零
 	o_newSlot_cu	=	op ==newSlot && ~i_QueryRep_dec 	;
 	o_decSlot_cu	=	op ==newSlot && i_QueryRep_dec 	;
-	o_key_shift_cu	=	(op ==readKEY_En ||op ==readKEY_De) && shiftaddr	;
+	o_key_shift_cu	=	op ==read_public_KEY && shiftaddr	;
 	o_reload_crc 	=	i_newcmd_dem || i_reload_ocu 	;
 	o_valid_crc 	 =	i_valid_dem || i_crcen_ocu 	;
 	o_data_in_crc =  i_data_dem || i_data_ocu  ;
@@ -1587,7 +1374,7 @@ reg 		en_rng		;
 	assign clear_top	=	o_clear_cu || i_newcmd_dem	;
 	assign backing_cu	=	op ==BackScatter ;
 	assign demoding_cu	=	state !=Poweron &&(~t1_start ||op ==waiting )&&(op!=BackScatter)	;
-	assign Init_cu		=	(op ==IDLE)||(op ==readCryptoflag)||(op ==readCrypto_En_psw)||(op ==readCRC)||(op ==readPC)||(op ==readLock)||(op ==readAccess)||(op ==InitDone);
+	assign Init_cu		=	(op ==IDLE)||(op ==readCRC)||(op ==readPC)||(op ==readLock)||(op ==readAccess)||(op ==InitDone);
 	 
 //democulate 的时钟在poweron/backscatter时期是不工作的。不接收I_PIE的信号。只有在waiting时有效。
 always @ (negedge clk or negedge rst_n)
@@ -1596,7 +1383,7 @@ always @ (negedge clk or negedge rst_n)
 		en_rom 	=	1'b0;
 		en_dem  =	1'b0	;
 		en_aes 	=	1'b0;
-		en_act  = 1'b0;
+		en_act  = 	1'b0;
 		en_mod 	=	1'b0;
 		en_ocu  =	1'b0;
 		en_crc 	=	1'b0;
@@ -1606,8 +1393,8 @@ always @ (negedge clk or negedge rst_n)
 		begin 
 		en_rom 	=	((~backing_cu ) ? o_rd_rom ||o_wr_rom : backing_cu && o_en2blf_mod	);
 		en_dem  =	demoding_cu || clear_top 		;
-		en_aes 	=	i_en_AES || clear_top	;
-		en_act  = 	Crypto_Tag || clear_top	;
+		en_aes 	=	i_en_ECC || clear_top	;
+		en_act  = 	1'b1 || clear_top	;
 		en_mod 	=	o_en2blf_mod || clear_top 		;
 		en_ocu  =	o_datarate_ocu || clear_top 	;
 		en_crc 	=	o_reload_crc || o_valid_crc	;
