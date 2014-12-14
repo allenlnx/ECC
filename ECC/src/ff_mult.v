@@ -5,27 +5,18 @@ describe : Digit-Serial Most-Significant-Digit-First Multiplier
 version : 1.1
 ***********************************************/
 module ff_mult(
-               clk,
-               rst_n,
-					a,
-					b,
-					start,
-					p,
-					done);
+				input	clk,
+				input	rst_n,
+				input	start,
+				input	[162:0]	a,
+				input	[162:0]	b,
 					
+				output	reg [162:0]	p,
+				output	reg 		done
+				);
 					
-input  clk,rst_n,start;
-input  [162:0]  a,b;
-
-output [162:0]  p;
-output  done;
-
-//reg [162:0]  p;
-
 /*******************internal via *********************/
 reg [5:0] s;
-reg [162:0] p;
-reg done;
 reg d0,d1,d2,d3;
 wire [165:0] g;
 wire [162:0] c;
@@ -37,16 +28,7 @@ else if(!start)
   s<=6'b0;
 else if(start)
   s<=s+1;
-  
-/* 
-always @(posedge clk or negedge rst_n)
-if(!rst_n)
-  p<=163'b0;
-else if(done)
-  p<=163'b0;
-else if(start)
-  p<=c;
-*/
+
 always @(posedge clk or negedge rst_n or negedge start)
 begin
 if(!rst_n)
@@ -61,7 +43,6 @@ if(!rst_n)
 else if (start == 1'b0)
   begin 
      done <= 1'b0;
-  //   p <= 163'b0;
   end
 else case (s)
   6'd42:   begin   p <= p;   end

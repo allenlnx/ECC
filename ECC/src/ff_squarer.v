@@ -4,19 +4,12 @@ author : wu cheng
 describe : Finite Field Squarer
 version : 1.0
 ***********************************************/
-module ff_squarer(  a,					
-
-					c);
-					
-
-input   [162:0]	   a;
+module ff_squarer(  
+				input	[162:0]	a,					
+				output  [162:0]	c
+				);
 
 
-output  [162:0]    c;
-/*******************internal via *********************/
-
-
-/*******************procedure ***************************/
 assign c[0] = a[0] ^ a[160];
 assign c[1] = a[82] ^ a[162] ^ a[160];
 assign c[2] = a[1] ^ a[161];
@@ -329,6 +322,5 @@ assign c[160] = a[80] ^ a[160] ^ a[158];
 assign c[161] = a[162] ^ a[159];
  
 assign c[162] = a[81] ^ a[161] ^ a[159];
-
 
 endmodule

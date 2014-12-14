@@ -1,224 +1,113 @@
 /*************************************************
 this module is the control unit of the baseband 
 module name : control
-auther: xshen & xgchang
+auther: xshen & xgchang & lhzhu & chengwu
 date : 2010-11-20
 modified: 2010-12-25
+modified: 2014-12-12
 ***************************************************/
 `timescale 1ns/100ps
 module control (
-	clk		,
-	rst_n	,
-	SET ,
-	i_tpri_dem	,
-	i_newcmd_dem	,
-	i_valid_dem   ,
-	i_data_dem  ,
-	i_t1_dem		,
-	i_t1_start_dem	,
-	i_Query_dec	,
-	i_QueryAdjust_dec	,
-	i_QueryRep_dec	,
-	i_ACK_dec	,
-	i_ReqRN_dec	,
-	i_Read_dec	,
-	i_Write_dec	,
-	i_TestWrite_dec	,
-	i_TestRead_dec	,
-	i_inventory_dec	,
-	i_Lock_dec	,
-	i_Select_dec	,
-	i_Access_dec	,
-	i_cmdok_dec	,
-	i_handle_dec	,
-	i_m_dec		,
-	i_ebv_flag_dec	,
-	i_addr_shift_dec	,
-	i_data_shift_dec	,
-	i_wcnt_shift_dec	,
-	i_data_dec	,
-	i_Lock_payload_dec	,
-	i_target_dec	,
-	i_session_dec	,
-	i_session_done	,
-	i_session2_dec	,
-	i_sel_dec	,
-	i_length_shift_dec	,
-	i_mask_shift_dec	,
-	i_targetaction_shift_dec	,
-	i_access_shift_dec	,
-	i_data_rom_16bits	,
-	i_done_rom	,
-	i_done_ECC	,
+	input			clk		,
+	input			rst_n	,
+	input			SET ,
+	input	[5:0]	i_tpri_dem	,
+	input			i_newcmd_dem	,
+	input			i_valid_dem   ,
+	input			i_data_dem  ,
+	input	[8:0]	i_t1_dem		,
+	input			i_t1_start_dem	,
+	input			i_Query_dec	,
+	input			i_QueryAdjust_dec	,
+	input			i_QueryRep_dec	,
+	input			i_ACK_dec	,
+	input			i_ReqRN_dec	,
+	input			i_Read_dec	,
+	input			i_Write_dec	,
+	input			i_TestWrite_dec	,
+	input			i_TestRead_dec	,
+	input			i_inventory_dec	,
+	input			i_Lock_dec	,
+	input			i_Select_dec	,
+	input			i_Access_dec	,
+	input			i_cmdok_dec	,
+	input	[15:0]	i_handle_dec	,
+	input	[1:0]	i_m_dec		,
+	input			i_ebv_flag_dec	,
+	input			i_addr_shift_dec	,
+	input			i_data_shift_dec	,
+	input			i_wcnt_shift_dec	,
+	input			i_data_dec	,
+	input			i_Lock_payload_dec	,
+	input			i_target_dec	,
+	input	[1:0]	i_session_dec	,
+	input			i_session_done	,
+	input	[1:0]	i_session2_dec	,
+	input	[1:0]	i_sel_dec	,
+	input			i_length_shift_dec	,
+	input			i_mask_shift_dec	,
+	input			i_targetaction_shift_dec	,
+	input			i_access_shift_dec	,
+	input	[15:0]	i_data_rom_16bits	,
+	input			i_done_rom	,
+	input			i_done_ECC	,
 	//-----added by lhzhu----- //
-	i_fifo_full_rom	,
-	i_shiftaddr_ocu	,
-	TEST,
-	//-----added by lhzhu----- //
-	i_reload_ocu  ,
-	i_crcen_ocu  ,
-	i_data_ocu  ,
-	i_done_ocu	,
-	i_back_rom_ocu	,
-	i_random_rng	,
-	i_slotz_rng	,
-	i_en_ECC  ,
-	//-----added by chengwu----//
-	i_AuthParam_dec,
-	i_Authenticate_ok_dec,
-	i_Address_dec,
-	//-----added by chengwu----//
-	i_Authenticate_dec  ,
-	//-----added by lhzhu----- //
-	o_addr_rom		,
-	o_rd_rom		,
-	o_wr_rom		,
-
+	input			i_fifo_full_rom	,
+	input			i_shiftaddr_ocu	,
+	input			TEST,
+	//------------------------ //
 	
-//	o_data_rom	,
-	o_wordcnt_rom	,
-	o_handle_cu		,
-	o_random_cu		,
-	o_decSlot_cu	,
-	o_newSlot_cu	,
-	o_clear_cu	,
-	o_key_shift_cu	,
-	o_payload_valid_cu ,
-	o_seed_in_rng	,
-	o_datarate_ocu	,
-	o_en2blf_mod	,
-	o_reload_crc ,
-	o_valid_crc ,
-	o_data_in_crc ,
-	o_time_up   ,
+	input			i_reload_ocu  ,
+	input			i_crcen_ocu  ,
+	input			i_data_ocu  ,
+	input			i_done_ocu	,
+	input			i_back_rom_ocu	,
+	input	[15:0]	i_random_rng	,
+	input			i_slotz_rng	,
+	input			i_en_ECC  ,
+	
+	//-----added by chengwu----//
+	input	[7:0]	i_AuthParam_dec,
+	input			i_Authenticate_ok_dec,
+	input	[15:0]	i_Address_dec,
+	input			i_Authenticate_dec  ,
+	//-------------------------//
+	
+	//-----added by lhzhu----- //
+	output	reg [6:0]	o_addr_rom		,
+	output	reg			o_rd_rom		,
+	output	reg 		o_wr_rom		,
+	//-------------------------//
+	
+	output	reg	[7:0]	o_wordcnt_rom	,
+	output	reg	[15:0]	o_handle_cu		,
+	output	reg [15:0]	o_random_cu		,
+	output	reg 		o_decSlot_cu	,
+	output	reg 		o_newSlot_cu	,
+	output	reg 		o_clear_cu	,
+	output	reg 		o_key_shift_cu	,	
+	output	reg			o_seed_in_rng	,
+	output	reg 		o_datarate_ocu	,
+	output	reg 		o_en2blf_mod	,
+	output	reg 		o_reload_crc ,
+	output	reg 		o_valid_crc ,
+	output	reg 		o_data_in_crc ,
+	output		 		o_time_up   ,
+	output	 			o_payload_valid_cu ,
 	//---------added by lhzhu----- //
-	o_Authenticate_step_cu , //mark the current authenticate step
-	o_done_key	,
+	output	reg [1:0]	o_Authenticate_step_cu , //mark the current authenticate step
+	output				o_done_key	,
 	//---------------------------- //
-	o_clk_rom 	 ,
-	o_clk_dem  ,
-	o_clk_aes  ,
-	o_clk_act  ,
-	o_clk_mod  ,
-	o_clk_ocu  ,
-	o_clk_crc  ,
-	o_clk_rng	
+	output	reg 		o_clk_rom 	 ,
+	output	reg 		o_clk_dem  ,
+	output	reg 		o_clk_aes  ,
+	output	reg 		o_clk_act  ,
+	output	reg 		o_clk_mod  ,
+	output	reg 		o_clk_ocu  ,
+	output	reg 		o_clk_crc  ,
+	output	reg 		o_clk_rng	
 			);
 	
-input			clk		;
-input			rst_n		;
-input     SET ;			//set=1 代表有时间限制
-input			i_Query_dec	;
-input			i_QueryAdjust_dec	;
-input			i_QueryRep_dec	;
-input			i_ACK_dec	;
-input			i_ReqRN_dec	;
-input			i_Read_dec	;
-input			i_TestWrite_dec;
-input			i_Write_dec	;
-input			i_TestRead_dec	;
-input			i_inventory_dec	;
-input			i_Lock_dec	;
-input			i_Select_dec	;
-input			i_Access_dec	;
-input			i_cmdok_dec	;
-input	[15:0]		i_handle_dec	;
-input	[1:0]		i_m_dec		;
-input			i_addr_shift_dec	;
-input			i_data_shift_dec	;
-input			i_wcnt_shift_dec	;
-input			i_ebv_flag_dec		;
-input			i_data_dec	;
-input			i_Lock_payload_dec	;
-input			i_target_dec	;
-input	[1:0]		i_session_dec	;  //什么含义？
-input			i_session_done	;
-input	[1:0]		i_session2_dec	;  //什么含义？
-input	[1:0]		i_sel_dec	;
-input	[5:0]		i_tpri_dem	;
-input			i_newcmd_dem	;
-input     i_valid_dem   ;
-input   	i_data_dem  ;
-input	[8:0]		i_t1_dem		;
-input			i_t1_start_dem	;
-input			i_length_shift_dec	;
-input			i_mask_shift_dec	;
-input			i_targetaction_shift_dec	;
-input			i_access_shift_dec	;
-input	[15:0]		i_data_rom_16bits	;
-input			i_done_rom	;
-input			i_fifo_full_rom	;
-input     i_reload_ocu  ;
-input    	i_crcen_ocu  ;
-input   	i_data_ocu  ;
-input			i_done_ocu	;
-input			i_back_rom_ocu	;
-input	[15:0]		i_random_rng	;
-input			i_slotz_rng	;
-input     i_en_ECC    ;
-input			i_shiftaddr_ocu	;
-//-----added by chengwu----//
-input 	[7:0]	i_AuthParam_dec;
-input 	i_done_ECC;
-input	i_Authenticate_ok_dec;
-input	[15:0]	i_Address_dec;
-//-----added by chengwu----//
-
-
-output	[7:0]		o_wordcnt_rom	;
-reg	[7:0]		o_wordcnt_rom	;
-output	[6:0]		o_addr_rom		;
-reg	[6:0]		o_addr_rom		;
-output			o_rd_rom		;
-reg			o_rd_rom		;
-output			o_wr_rom		;
-reg			o_wr_rom		;
-output	[15:0]		o_handle_cu		;
-reg	[15:0]		o_handle_cu		;
-output	[15:0]		o_random_cu		;
-reg	[15:0]		o_random_cu		;
-output			o_seed_in_rng	;
-reg			o_seed_in_rng	;
-output		o_decSlot_cu	;
-reg			o_decSlot_cu	;
-output		o_newSlot_cu	;
-reg			o_newSlot_cu	;
-output		o_clear_cu	;
-reg			o_clear_cu	;
-output		o_datarate_ocu	;
-reg			o_datarate_ocu	;
-output		o_key_shift_cu	;
-reg			o_key_shift_cu	;
-output		o_en2blf_mod	;
-reg			o_en2blf_mod	;
-output  	o_payload_valid_cu;
-output 		o_reload_crc ;
-reg     	o_reload_crc ;
-output		o_valid_crc ;
-reg     	o_valid_crc ;
-output		o_data_in_crc ;
-reg  		o_data_in_crc ;
-output 		o_time_up ;
-
-output  o_clk_rom 	 ;
-output	o_clk_dem  ;
-output	o_clk_aes  ;
-output	o_clk_act  ;
-output	o_clk_mod  ;
-output	o_clk_ocu  ;
-output	o_clk_crc  ;
-output	o_clk_rng	;
-
-reg  o_clk_rom 	 ;
-reg	o_clk_dem  ;
-reg	o_clk_aes  ;
-reg	o_clk_act  ;
-reg	o_clk_mod  ;
-reg	o_clk_ocu  ;
-reg	o_clk_crc  ;
-reg	o_clk_rng	;
-
-
 parameter   Poweron=4'b0000;
 parameter	Ready=4'b0001;
 parameter   Arbitrate=4'b0010;
@@ -242,79 +131,67 @@ readrom=5'd10,
 writeRom=5'd11,
 newSlot=5'd12, 
 newQ=5'd13,
- checkSlot=5'd14,
- authen=5'd15, 
- newHandle=5'd16,
- newRN=5'd17, 
- waitT1=5'd18, 
- BackScatter=5'd19, 
- clearCmd=5'd20, 
- Lock=5'd21, 
- Compare=5'd22,
- UpdateID=5'd23,
- calculate = 5'd26 ;
+checkSlot=5'd14,
+authen=5'd15, 
+newHandle=5'd16,
+newRN=5'd17, 
+waitT1=5'd18, 
+BackScatter=5'd19, 
+clearCmd=5'd20, 
+Lock=5'd21, 
+Compare=5'd22,
+UpdateID=5'd23,
+calculate = 5'd26 ;
  
 reg [3:0] 	state,next_ts	;
 reg [4:0]	op,next_op	;
 reg	[4:0]	pc		;
-//reg	[2:0]	mode		;
 wire		newstate	;
-//wire 		mode_security	;
 wire 		handle_valid	;
 //---------amended-------//
 reg 		read_valid	;
 reg 		write_valid	;
 //---------amended-------//
-reg[16:0] timer;     //for time counter, 100ms limited
+reg	[16:0] 	timer;     //for time counter, 100ms limited
 reg 		back_rom		;	
-reg  	[5:0]	c_pri		;
-reg  	[2:0]	c_m		;
+reg [5:0]	c_pri		;
+reg	[2:0]	c_m		;
 //		reg 	[8:0]	counter		; temp way to run ecc -- chengwu
-reg 	[15:0]	counter		;
+reg [15:0]	counter		;
 reg 		t1_start	;
 reg	[19:0]	Lock_payload	;
 reg	[9:0]	Lock_flag	;
-//wire	[9:0]	Lock_flag_w	;
-reg 	[4:0]	Inventoried_flag;
+reg	[4:0]	Inventoried_flag;
 reg	[7:0]	mask_length	;
 reg	[4:0]	mask_word_length;
 reg	[255:0]	mask		;   //mask used for Inventory
 reg	[255:0] mask_comparation;
 reg 		Select_done	;
-reg		Compare_done	;
-reg		Select_match	;
+reg			Compare_done	;
+reg			Select_match	;
 reg	[3:0]	mask_length_adjust	;
-reg 	[5:0]	targetaction	;
-reg		adjust_flag	;
+reg [5:0]	targetaction	;
+reg			adjust_flag	;
 reg	[31:0]	access_psw	;
-reg		access_flag	;
+reg			access_flag	;
 reg	[15:0]	access_par	;  //access_par
-reg		access_delay	;
+reg			access_delay	;
 wire		access_posedge	;
 wire		Query_match	;
 wire		Query_ar_match	;
 reg	[1:0]	pre_session	;
-reg		new_session	;
-reg		query_delay	;
-reg		querya_delay	;
-reg		queryr_delay	;
+reg			new_session	;
+reg			query_delay	;
+reg			querya_delay	;
+reg			queryr_delay	;
 wire		query_posedge	;
 wire		query_ar_posedge;	
-reg		trans_flag	;
+reg			trans_flag	;
 // those update in Poweron 
 reg 		en_poweron	; //power mode equals to 1
 reg 		clk_poweron	;	
 
 // ------------ added by lhzhu -------------- //
-input		TEST	;
-wire		TEST	;
-input		i_Authenticate_dec  ; 
-
-output[1:0]		o_Authenticate_step_cu ;
-reg[1:0]			o_Authenticate_step_cu ;
-
-output		o_done_key	;
-wire		o_done_key	;
 reg			done_rom_d	;
 wire		done_rom	;
 wire		Init_cu		;
@@ -986,14 +863,6 @@ always 	@(posedge clk or negedge rst_n)
 
 assign	query_posedge	=	(i_Query_dec)&&( ~query_delay)	;
 assign	query_ar_posedge=	(i_QueryRep_dec && ~queryr_delay) || (i_QueryAdjust_dec && ~ querya_delay)	;
-
-/////------------------------------------------------------//////////////////
-/////------------------------------------------------------//////////////////
-/////------------------------------------------------------//////////////////
-/////------------------------------------------------------//////////////////
-/////------------------------------------------------------//////////////////
-/////------------------------------------------------------//////////////////
-/////------------------------------------------------------//////////////////
 
 //update inventoried flags
 always	@(posedge clk or negedge rst_n)

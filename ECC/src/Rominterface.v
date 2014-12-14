@@ -1,49 +1,30 @@
 `timescale 1ns/100ps
 module rominterface (
-	clk		,
-	rst_n	,
-	i_rd_rom		,
-	i_wr_rom		,
-	i_addr_rom		,
-	i_wordcnt_rom	,
-	o_data_rom_16bits	,
-	o_fifo_full_rom	,	
-	o_done_rom	,
-	Q		,
-	CEN	,
-	A	
+	input			clk		,
+	input			rst_n	,
+	input			i_rd_rom		,
+	input			i_wr_rom		,
+	input	[6:0]	i_addr_rom		,
+	input	[7:0]	i_wordcnt_rom	,
+	input	[15:0]	Q		,
+		
+	output				o_fifo_full_rom	,	
+	output				o_done_rom	,	
+	output				CEN	,
+	output	reg [6:0]	A	,
+	output	reg [15:0]	o_data_rom_16bits	
 	);
 
-input			clk		;
-input			rst_n		;	
-input			i_rd_rom		;
-input			i_wr_rom		;
-input	[6:0]		i_addr_rom		;
-input	[7:0]		i_wordcnt_rom	;
 
-output	[15:0]		o_data_rom_16bits	;
-reg	[15:0]		o_data_rom_16bits	;
-
-output			o_fifo_full_rom	;
-output			o_done_rom	;
-wire			o_done_rom	;
-
-//----------------------to ROM ---------------//
-
-input	[15:0]		Q		;   //length changed
-wire	[15:0]		Q		;
-output 			CEN	;
-wire			CEN	;
-output [6:0]	A	;
-reg    [6:0]	A	;
-wire			new_round;
-reg				CEN_d ;
-reg		[6:0]	addr_buf	;
-
-//-------------------------------------------//
 parameter
 	Idle =2'd0 , Addr =2'd1 , Cen =2'd2 , Finish =2'd3 ;
 //	CEN2nd =4 , Store =5, Finish = 6;
+	
+//----------------------to ROM ---------------//
+wire			new_round;
+reg				CEN_d ;
+reg		[6:0]	addr_buf	;
+//-------------------------------------------//
 
 reg	[1:0]	next, state ;
 

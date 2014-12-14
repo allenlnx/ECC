@@ -1,18 +1,13 @@
 module reg_rom (
-    Q,
-    CLK,
-    CEN,
-    A,
-	rst_n
+    input			CLK,
+    input			CEN,
+    input			rst_n,
+	input	[5:0]	A,
+	
+	output	reg [15:0]	Q
         )	;
 				
-   output [15:0]            Q;
-   input 					rst_n;
-   input                    CLK;
-   input                    CEN;
-   input [5:0]              A;
-   reg [15:0]				Q;
-   reg [15:0]			register[63:0]	;
+   reg [15:0]	register[63:0]	;
 
    always@ (posedge CLK or negedge rst_n)
 	if(!rst_n)

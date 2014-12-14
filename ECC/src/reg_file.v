@@ -4,38 +4,19 @@ author : wu cheng
 describe:define a register array freshing one value at a time
 version:1.1  
 *********************************/
-module reg_file  (     clk,
-                       rst_n,
-				           s,
-				           reg_select,
-				           xa,
-				           xb,
-				           za,
-				           zb,
-				           zc);
+module reg_file  (    
+					input 			clk,
+                    input 			rst_n,
+				    input	[162:0]	s,
+				    input 	[2:0]	reg_select,
+				           
+					output	reg [162:0]	xa,
+				    output	reg [162:0]	xb,
+				    output	reg [162:0]	za,
+				    output	reg [162:0]	zb,
+				    output	reg [162:0]	zc
+					);
 				  
-				  
-input                clk;
-input                rst_n;
-input      [162:0]   s;
-input        [2:0]   reg_select;
-
-output     [162:0]    xa;
-output     [162:0]    xb;
-output     [162:0]    za;
-output     [162:0]    zb;
-output     [162:0]    zc;
-
-
-reg     [162:0]    xa;
-reg     [162:0]    xb;
-reg     [162:0]    za;
-reg     [162:0]    zb;
-reg     [162:0]    zc;
-
-/*******************internal via *********************/
-
-/*******************procedure ***************************/
 always @(posedge clk or negedge rst_n)
 if(!rst_n)
 begin

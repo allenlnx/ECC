@@ -1,29 +1,16 @@
 `timescale 1ns/100ps
 module random_generator (
-	clk		,
-	rst_n	,
-	i_q_dec		,
-	i_newSlot_cu	,
-	i_decSlot_cu	,
-	i_seed_in_rng	,
-	i_data_rom_16bits	,
-	o_random_rng	,
-	o_slotz_rng	
+	input			clk		,
+	input			rst_n	,
+	input	[3:0]	i_q_dec		,
+	input			i_newSlot_cu	,
+	input			i_decSlot_cu	,
+	input			i_seed_in_rng	,
+	input	[15:0]	i_data_rom_16bits	,
+	
+	output reg [15:0] 	o_random_rng	,
+	output reg 			o_slotz_rng	
 			);
-
-input			clk		;
-input			rst_n		;
-input	[3:0]		i_q_dec		;
-input			i_newSlot_cu	;
-input			i_decSlot_cu	;
-input			i_seed_in_rng	;
-input	[15:0]		i_data_rom_16bits	;
-
-output	[15:0]		o_random_rng	;
-reg	[15:0]		o_random_rng	;
-output			o_slotz_rng	;
-reg			o_slotz_rng	;
-
 
 //----------------------------------------------------------------------
 // random number generator

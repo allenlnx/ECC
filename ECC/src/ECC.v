@@ -1,26 +1,16 @@
 module ECC(
-	clk,
-	rst_n,
-	ecc_start,
-	g,
-	k,
-	o_ecc_outxa,
-	o_ecc_outza,
-	ecc_done);
+	input			clk,
+	input			rst_n,
+	input			ecc_start,
+	input	[162:0]	g,
+	input	[162:0]	k,
+	output 	[175:0]	o_ecc_outxa,
+	output 	[175:0]	o_ecc_outza,
+	output reg 		ecc_done
+	);
 	
-input clk;
-input rst_n;
-input[162:0] g;
-input[162:0] k;
-input ecc_start;
-
-output[175:0] o_ecc_outxa;
-output[175:0] o_ecc_outza;
-output ecc_done;
-
 reg[162:0] ecc_outxa;
 reg[162:0] ecc_outza;
-reg ecc_done;
 
 assign o_ecc_outxa = {13'b0,ecc_outxa};
 assign o_ecc_outza = {13'b0,ecc_outza};

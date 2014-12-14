@@ -1,163 +1,63 @@
 `timescale 1ns/100ps
 module	decode	(
-	clk		,
-	rst_n	,
-	i_valid_dem	,
-	i_data_dem	,
-	i_newcmd_dem	,
-	i_preamble_dem	,
-	i_clear_cu	,
+	input	clk		,
+	input	rst_n	,
+	input	i_valid_dem	,
+	input	i_data_dem	,
+	input	i_newcmd_dem	,
+	input	i_preamble_dem	,
+	input	i_clear_cu	,
 	//--------------added by lhzhu -------------//
-	i_Authenticate_step_cu ,
+	input	[1:0]	i_Authenticate_step_cu ,
 	//--------------added by lhzhu -------------//
-	o_Query_dec	,
-	o_QueryRep_dec	,
-	o_QueryAdjust_dec	,
-	o_ACK_dec	,
-	o_ReqRN_dec	,
-	o_Read_dec	,
-	o_Write_dec	,
-	o_TestWrite_dec	,
-	o_TestRead_dec,
-	o_Lock_dec	,
-	o_Select_dec	,
-	o_inventory_dec	,
-	o_data_dec	,
-	o_cmdok_dec	,
-	o_dr_dec		,
-	o_handle_dec	,
-	o_Lock_payload_dec	,
-	o_q_dec		,
-	o_m_dec		,
-	o_length_shift_dec	,
-	o_mask_shift_dec	,
-	o_targetaction_shift_dec	,
-	o_addr_shift_dec	,
-	o_data_shift_dec	,
-	o_wcnt_shift_dec	,
-	o_trext_dec	,
-	o_target_dec	,
-	o_session_dec	,
-	o_session_done	,
-	o_session2_dec	,
-	o_sel_dec	,
-	o_Access_dec	,
-	o_access_shift_dec	,
-	o_ebv_flag_dec	,
+	output	reg 		o_Query_dec	,
+	output	reg 		o_QueryRep_dec	,
+	output	reg 		o_QueryAdjust_dec	,
+	output	reg 		o_ACK_dec	,
+	output	reg 		o_ReqRN_dec	,
+	output	reg 		o_Read_dec	,
+	output	reg 		o_Write_dec	,
+	output	reg 		o_TestWrite_dec	,
+	output	reg 		o_TestRead_dec,
+	output	reg 		o_Lock_dec	,
+	output	reg 		o_Select_dec	,
+	output	reg 		o_inventory_dec	,
+	output	reg 		o_data_dec	,
+	output	reg 		o_cmdok_dec	,
+	output	reg 		o_dr_dec		,
+	output	reg [15:0]	o_handle_dec	,
+	output	reg 		o_Lock_payload_dec	,
+	output	reg [3:0]	o_q_dec		,
+	output	reg [1:0]	o_m_dec		,
+	output	reg 		o_length_shift_dec	,
+	output	reg 		o_mask_shift_dec	,
+	output	reg 		o_targetaction_shift_dec	,
+	output	reg 		o_addr_shift_dec	,
+	output	reg 		o_data_shift_dec	,
+	output	reg 		o_wcnt_shift_dec	,
+	output	reg 		o_trext_dec	,
+	output	reg 		o_target_dec	,
+	output	reg [1:0]	o_session_dec	,
+	output	reg 		o_session_done	,
+	output	reg [1:0]	o_session2_dec	,
+	output	reg [1:0]	o_sel_dec	,
+	output	reg 		o_Access_dec	,
+	output	reg 		o_access_shift_dec	,
+	output	reg 		o_ebv_flag_dec	,
 //--------------added by lhzhu -------------//
-	o_Authenticate_dec ,
-	o_Authenticate_shift_dec	,			//authenticate的循环移位信号
-	o_Authenticate_ok_dec	,			//authenticate的内容输出完成
-	o_csi_dec		,							//CSI译码值
-	o_AuthParam_dec	,	
-	o_Address_dec
-				);
-//--------------added by lhzhu -------------//
-input			clk		;
-input			rst_n		;
-input			i_valid_dem	;
-input			i_data_dem	;
-input			i_newcmd_dem	;
-input			i_preamble_dem	;
-input			i_clear_cu	;
-input[1:0]		i_Authenticate_step_cu ;
+	output	reg 		o_Authenticate_dec ,
+	output	reg 		o_Authenticate_shift_dec	,			//authenticate的循环移位信号
+	output	reg 		o_Authenticate_ok_dec	,			//authenticate的内容输出完成
+	output	reg	[7:0]	o_csi_dec		,							//CSI译码值
+	output	reg [7:0]	o_AuthParam_dec	,	
+	output	reg [15:0]	o_Address_dec
+	);
 
-output			o_Query_dec	;
-reg			o_Query_dec	;
-output			o_QueryRep_dec	;
-reg			o_QueryRep_dec	;
-output			o_QueryAdjust_dec	;
-reg			o_QueryAdjust_dec	;
-output			o_ACK_dec	;
-reg			o_ACK_dec	;
-//output			o_NAK_dec	;
-reg			o_NAK_dec	;
-output			o_ReqRN_dec	;
-reg			o_ReqRN_dec	;
-output			o_Read_dec	;
-reg			o_Read_dec	;
-output			o_Write_dec	;
-reg			o_Write_dec	;
-output			o_TestWrite_dec	;
-reg			o_TestWrite_dec	;
-output		o_TestRead_dec	;
-reg			o_TestRead_dec	;
-output			o_Lock_dec	;
-reg			o_Lock_dec	;
-output			o_Select_dec	;
-reg			o_Select_dec	;
-
-//------------added by lhzhu--------------//
-output		o_Authenticate_dec  ;
-reg			o_Authenticate_dec  ; 
-output		o_csi_dec ;
-output 		o_Authenticate_shift_dec	;
-output 		o_Authenticate_ok_dec		;
-reg			o_Authenticate_shift_dec	;
-reg			o_Authenticate_ok_dec		;
-
-//------------added by lhzhu--------------//
-
-output			o_inventory_dec	;
-reg			o_inventory_dec	;
-output			o_data_dec	;
-reg			o_data_dec	;
-output			o_cmdok_dec	;
-reg			o_cmdok_dec	;
-output			o_dr_dec		;
-reg			o_dr_dec		;
-output	[15:0]		o_handle_dec	;
-reg	[15:0]		o_handle_dec	;
-output			o_Lock_payload_dec	;
-reg			o_Lock_payload_dec	;
-output	[3:0]		o_q_dec		;
-reg	[3:0]		o_q_dec		;
-output	[1:0]		o_m_dec		;
-reg	[1:0]		o_m_dec		;
-output			o_length_shift_dec	;
-reg			o_length_shift_dec	;
-output			o_mask_shift_dec	;
-reg			o_mask_shift_dec	;
-output			o_targetaction_shift_dec	;
-reg			o_targetaction_shift_dec	;
-output			o_addr_shift_dec	;
-reg			o_addr_shift_dec	;
-output			o_data_shift_dec	;
-reg			o_data_shift_dec	;
-output			o_wcnt_shift_dec	;
-reg			o_wcnt_shift_dec	;
-output			o_trext_dec	;
-reg			o_trext_dec	;
-output			o_target_dec	;
-reg			o_target_dec	;
-output	[1:0]		o_session_dec	;
-reg	[1:0]		o_session_dec	;
-output			o_session_done	;
-reg			o_session_done	;
-output	[1:0]		o_session2_dec	;
-reg	[1:0]		o_session2_dec	;
-output	[1:0]		o_sel_dec	;
-reg	[1:0]		o_sel_dec	;
-output			o_Access_dec	;
-reg			o_Access_dec	;
-output			o_access_shift_dec	;
-reg			o_access_shift_dec	;
-output	o_ebv_flag_dec	;
-reg			o_ebv_flag_dec;
-
-//--------added by chenwu
-output[7:0]	o_AuthParam_dec	;
-reg [7:0]	o_AuthParam_dec	;
-output[15:0] o_Address_dec	;
-reg [15:0]	o_Address_dec	;
-
+reg				o_NAK_dec	;
 reg  [1:0]		o_rfu_dec ;
 reg  			o_senRep_dec;
 reg  			o_incRepLen_dec;
-reg  [7:0]		o_csi_dec;
 reg  [11:0]		message_length;
-
-//--------added by chenwu
 
 parameter	IDLE     	=	3'b000	; 
 parameter	HUFFMAN 	=	3'b001	; 
@@ -173,8 +73,6 @@ reg	[7:0]	length		;
 reg	[7:0]	huffbuf		;
 reg			cmd_name_ok	;
 reg	[10:0]	max_bits_data	;
-
-
 
 always	@(posedge clk or negedge rst_n)
 	if (~rst_n)

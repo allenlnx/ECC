@@ -1,39 +1,17 @@
 `timescale 1ns/100ps
 module demodu	(
-  clk		,
-	rst_n		,
-	i_pie	  ,
-	i_dr_dec		,
-	o_data_dem	,
-	o_valid_dem	,
-	o_newcmd_dem	,
-	o_preamble_dem,
-	o_tpri_dem	,
-	o_t1_dem		,
-	o_t1_start_dem	
-			);
-
-input			clk		;
-input			rst_n		;
-input			i_pie		;
-input			i_dr_dec		;
-output			o_data_dem	;	
-reg			o_data_dem	;
-output			o_valid_dem	;
-reg			o_valid_dem	;
-output			o_newcmd_dem	;
-reg			o_newcmd_dem	;
-output			o_preamble_dem	;
-reg			o_preamble_dem	;
-output	[5:0]		o_tpri_dem	;
-reg	[5:0]		o_tpri_dem	;
-output	[8:0]		o_t1_dem		;
-reg	[8:0]		o_t1_dem		;
-output			o_t1_start_dem	;
-reg			o_t1_start_dem	;
-
-
-
+	input	clk		,
+	input	rst_n		,
+	input	i_pie	  ,
+	input	i_dr_dec		,
+	output reg 			o_data_dem	,
+	output reg 			o_valid_dem	,
+	output reg 			o_newcmd_dem	,
+	output reg 			o_preamble_dem,
+	output reg [5:0] 	o_tpri_dem	,
+	output reg [8:0]	o_t1_dem		,
+	output reg 			o_t1_start_dem	
+	);
 
 // state[3] means counter to work
 // state[4] means counter to clear

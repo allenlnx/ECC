@@ -1,43 +1,29 @@
 `timescale 1ns/100ps
 module modulate(
-	clk		,
-	rst_n	,
-	i_data_ocu	,
-	i_m_dec		,
-	i_enable_mod	,
-	i_mblf_mod	,
-	i_violate_mod	,
-	i_en2blf_mod	,
-	i_clear_cu	,
-	o_data_mod	
+	input			clk		,
+	input			rst_n	,
+	input			i_data_ocu	,
+	input	[1:0]	i_m_dec		,
+	input			i_enable_mod	,
+	input			i_mblf_mod	,
+	input			i_violate_mod	,
+	input			i_en2blf_mod	,
+	input			i_clear_cu	,
+	
+	output	reg		o_data_mod	
 			);
 
-input			clk		;
-input			rst_n		;
-input			i_data_ocu	;
-input	[1:0]	i_m_dec		;
-input			i_enable_mod	;
-input			i_mblf_mod	;
-//input			i_dummy_mod	;
-input			i_violate_mod	;
-input			i_en2blf_mod	;
-input			i_clear_cu	;
-
-output			o_data_mod	;
-reg				o_data_mod	;
-
-
-parameter P1H	=	3'd1 	,
-	P1L	=	3'd0 	,
-	P2H	=	3'd3 	,
-	P2L	=	3'd2 	,
-	IDLE	=	3'd4	,
-	DONE	=	3'd6 ;
-	reg [2:0]		state, next	;
-
+parameter 	P1H	=	3'd1 	,
+			P1L	=	3'd0 	,
+			P2H	=	3'd3 	,
+			P2L	=	3'd2 	,
+			IDLE=	3'd4	,
+			DONE=	3'd6 	;
+	
+reg [2:0]	state, next	;
 reg 		mode_fm0	;
 reg 		mode_miller	;
-reg 	[3:0]	mc		;
+reg [3:0]	mc			;
 reg 		half_datarate	;
 reg 		datarate	;
 reg 		data_d		;

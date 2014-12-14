@@ -5,61 +5,29 @@ describe: ECC FSM designed according to Montgomery Ladder Algorithm
 version:1.2 
 *********************************/
 module ecc_fsm (
-            clk,
-            rst_n,
-			   k,
-			   ecc_start,
-			   m_done,
-			   m_start,
-			   reg_select,
-			   select_x,
-			   select_xab,
-			   select_z,
-			   select_zab,
-			   ss,
-			   st,
-			   sy,
-			   ecc_done);
-				  
-input                clk;
-input                rst_n;
-input      [162:0]   k;
-input                ecc_start;
-input                m_done;
-
-
-output                m_start;
-output     [2:0]      reg_select;
-
-output                select_x;
-output                select_xab;
-output                select_z;
-output                select_zab;
-
-output                ss;
-output                st;
-output                sy;
-output                ecc_done;
-
-reg                   m_start;
-
-reg                   select_x;
-reg                   select_xab;
-reg                   select_z;
-reg                   select_zab;
-
-reg                   ss;
-reg                   st;
-reg                   sy;
-reg                   ecc_done;
-
+            input			clk,
+            input			rst_n,
+			input	[162:0]	k,
+			input			ecc_start,
+			input			m_done,
+			
+			output	reg	   		m_start,
+			output	reg	[2:0]	reg_select,
+			output	reg	   		select_x,
+			output	reg	   		select_xab,
+			output	reg	   		select_z,
+			output	reg	   		select_zab,
+			output	reg	   		ss,
+			output	reg	   		st,
+			output	reg	   		sy,
+			output	reg	   		ecc_done
+				);
 
 /*******************internal via *********************/
 wire               ki;
 reg     [4:0]      processor_state,next_state;
 reg                step_done;
 reg     [7:0]      ecc_count;
-reg     [2:0]      reg_select;
 reg                real_ecc_start;
 /*******************procedure ***************************/
 assign ki = k[ecc_count];

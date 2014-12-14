@@ -1,98 +1,46 @@
 `timescale 1ns/100ps
 
 module outctrl	(
-	clk		,
-	rst_n	,
-	i_ACK_dec	,
+	input			clk		,
+	input			rst_n	,
+	input			i_ACK_dec	,
 	//---------added by lhzhu----------//
-	i_Authenticate_dec  ,
-	i_Authenticate_step_cu   ,
-	i_data_rom_16bits	,
+	input			i_Authenticate_dec  ,
+	input	[1:0]	i_Authenticate_step_cu   ,
+	input	[15:0]	i_data_rom_16bits	,
 	//---------------------------------//
-	i_ReqRN_dec	,
-	i_Read_dec	,
-	i_TestRead_dec,
-	i_Write_dec	,
-	i_TestWrite_dec	,
-	i_inventory_dec	,
-	i_Lock_dec	,
-	i_payload_valid_cu	,
-	i_wordcnt_rom	,
-	i_datarate_ocu	,
-	i_trext_dec	,
-	i_m_dec		,
-	i_clear_cu	,
-	i_handle_cu		,
-	i_random_cu		,
-	i_data_crc	,
+	input			i_ReqRN_dec	,
+	input			i_Read_dec	,
+	input			i_TestRead_dec,
+	input			i_Write_dec	,
+	input			i_TestWrite_dec	,
+	input			i_inventory_dec	,
+	input			i_Lock_dec	,
+	input			i_payload_valid_cu	,
+	input	[3:0]	i_wordcnt_rom	,
+	input			i_datarate_ocu	,
+	input			i_trext_dec	,
+	input	[1:0]	i_m_dec		,
+	input			i_clear_cu	,
+	input	[15:0]	i_handle_cu		,
+	input	[15:0]	i_random_cu		,
+	input	[15:0]	i_data_crc	,
 	//----------added by chengwu------------//
-	i_key,
-	i_ecc_outxa,
-	i_ecc_outza,
+	input	[175:0]	i_key,
+	input	[175:0]	i_ecc_outxa,
+	input	[175:0]	i_ecc_outza,
 	//--------------------------------------//
-	o_data_ocu	,
-	o_done_ocu	,
-	o_back_rom_ocu	,
-	o_crcen_ocu	,
-	o_reload_ocu	,
-	o_shift_crc	,
-	o_enable_mod	,
-	o_mblf_mod	,
-	o_violate_mod	,
-	o_shiftaddr_ocu
-	
+	output	reg 	o_data_ocu	,
+	output 	reg		o_done_ocu	,
+	output 	reg		o_back_rom_ocu	,
+	output 	reg		o_crcen_ocu	,
+	output 	reg		o_reload_ocu	,
+	output 	reg		o_shift_crc	,
+	output 	reg		o_enable_mod	,
+	output 	reg		o_mblf_mod	,
+	output 	reg		o_violate_mod	,
+	output 	reg		o_shiftaddr_ocu	
 			);
-
-input			clk		;
-input			rst_n		;
-input			i_ACK_dec	;
-input			i_ReqRN_dec	;
-input			i_Read_dec	;
-input			i_Write_dec	;
-input			i_TestWrite_dec	;
-input			i_TestRead_dec;
-input			i_inventory_dec	;
-input			i_Lock_dec	;
-input			i_payload_valid_cu	;
-input	[15:0]		i_data_rom_16bits	;
-input	[3:0]		i_wordcnt_rom	;
-input			i_datarate_ocu	;
-input			i_trext_dec	;
-input	[1:0]		i_m_dec		;
-input			i_clear_cu	;
-input	[15:0]		i_handle_cu		;
-input	[15:0]		i_random_cu		;
-input	[15:0]		i_data_crc	;
-
-output			o_data_ocu	;
-reg			o_data_ocu	;
-output			o_done_ocu	;
-reg      o_done_ocu	;
-output			o_back_rom_ocu	;
-reg			o_back_rom_ocu	;
-output			o_crcen_ocu	;
-reg			o_crcen_ocu	;
-output			o_reload_ocu	;
-reg			o_reload_ocu	;
-output			o_shift_crc	;
-reg			o_shift_crc	;
-output			o_enable_mod	;
-reg			o_enable_mod	;
-output			o_mblf_mod	;
-reg			o_mblf_mod	;
-output			o_violate_mod	;
-reg			o_violate_mod	;
-
-//-------------------added by lhzhu ---------------------//
-input 		i_Authenticate_dec  ;
-input[1:0] 		i_Authenticate_step_cu   ;
-output		o_shiftaddr_ocu	;
-reg		o_shiftaddr_ocu	;
-//--------------------------------------------------------//
-
-//-------------------added by chengwu ---------------------//
-input[175:0] i_key,i_ecc_outxa,i_ecc_outza;
-//--------------------------------------------------------//
 
 parameter IDLE=5'd1, DONE=5'd0, 
 	FourZ=5'd16, TwelveZ=5'd17, SixtromnZ=5'd18, 

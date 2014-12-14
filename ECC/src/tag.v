@@ -1,41 +1,20 @@
 `timescale 1ns/100ps
 module tag (
-	clk	,
-	rst_n	,
-	i_pie	,
-//	Q	,
-	i_force_Crypto,
-	TEST	,
-	SET	,
-	o_mod
-//	A	,
-//	clk_rom	,
-//	CEN
+	input	clk	,
+	input	rst_n	,
+	input	i_pie	,
+	input	i_force_Crypto,
+	input	TEST	,
+	input	SET	,
+	
+	output	o_mod
 	) ;
 
-	input 	clk 	;
-	input 	rst_n 	;
-	input 	i_pie 	;
-//	input	Q	;
-	input	i_force_Crypto;
-	input	TEST	;
-	input	SET	;
-	output 	o_mod 	;
-//	output	A	;
-//	output	clk_rom	;
-//	output	CEN	;
-	
 	// wires 
-	wire	rst_n	;
-	wire	i_pie	;
 	wire [15:0] Q	;
-	wire	TEST	;
-	wire	SET	;
-	wire	o_mod	;
-    	wire [6:0] A	;
+    wire [6:0] A	;
 	wire 	clk_rom ;
 	wire 	CEN	;
-
 
 tag_digital_core	core(
 	.clk		(clk 		),	
@@ -50,10 +29,6 @@ tag_digital_core	core(
 	.o_CEN_rom(CEN)
 	);
 	
-	
-
-
-
 //Bimod_Tag_ROM rom (
 reg_rom rom(
     .Q(Q),

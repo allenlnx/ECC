@@ -1,21 +1,13 @@
 `timescale 1ns/100ps
 module crc16 (
-	clk		,
-	rst_n		,
-	i_reload_crc	,
-	i_valid_crc	,
-	i_data_crc	,
-	i_shift_crc	,
-	o_data_crc		);
-
-input			clk		;
-input			rst_n		;
-input			i_reload_crc	;
-input			i_valid_crc	;
-input			i_data_crc	;
-input			i_shift_crc	;
-output	[15:0]		o_data_crc	;
-reg	[15:0]		o_data_crc	;
+	input	clk		,
+	input	rst_n		,
+	input	i_reload_crc	,
+	input	i_valid_crc	,
+	input	i_data_crc	,
+	input	i_shift_crc	,
+	output	reg [15:0]	o_data_crc		
+	);
 
 reg	[15:0]	crc16_d		;
 wire		temp	 	;
