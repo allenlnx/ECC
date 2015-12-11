@@ -1,5 +1,5 @@
 `define SEND_QUERY 500
-
+// parameter file
 
 `define trext_par 1  
 

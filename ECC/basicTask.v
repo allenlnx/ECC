@@ -1,3 +1,4 @@
+// this is a basic reader file
 `define EEPROM_PATH T_top.tag.\eeint1/eeprom
 include "a.v";
 
