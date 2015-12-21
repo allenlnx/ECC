@@ -1,6 +1,6 @@
 `define SEND_QUERY 500
 // parameter file
-
+// the second version 
 `define trext_par 1  
 
 //----relase t1 requirement----
