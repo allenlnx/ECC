@@ -61,23 +61,23 @@ always @(posedge clk or negedge rst_n)
 if(!rst_n)
   ecc_done<=0;
 else if((ecc_count == 8'b0000_0000)&&(processor_state == 5'd22))
-  ecc_done<=1;
+  ecc_done<=1'b1;
 else 
-  ecc_done<=0;
+  ecc_done<=1'b0;
 
 always @(posedge clk or negedge rst_n)
 if(!rst_n)
   begin
-  step_done <= 0;
-   select_x <= 0;
-   select_xab <= 0;
-	select_z <= 0;
-	select_zab <= 0;
-	ss<=0;
-	st<=0;
-	sy<=0;
-	reg_select<=0;
-	m_start<=0;
+  step_done <= 1'b0;
+   select_x <= 1'b0;
+   select_xab <= 1'b0;
+	select_z <= 1'b0;
+	select_zab <= 1'b0;
+	ss<=1'b0;
+	st<=1'b0;
+	sy<=1'b0;
+	reg_select<=1'b0;
+	m_start<=1'b0;
   end
 else 
   begin
